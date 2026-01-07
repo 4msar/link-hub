@@ -27,22 +27,27 @@ const mockLinks: LinkItem[] = [
 ];
 
 const fetchLinks = async (apiUrl?: string): Promise<LinkItem[]> => {
-    if (apiUrl) {
-        const response = await fetch(apiUrl, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${apiKey}`,
-            },
-        });
-        if (!response.ok) {
-            throw new Error("Failed to fetch links");
+    if (apiUrl && apiKey) {
+        try {
+            const response = await fetch(apiUrl, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${apiKey}`,
+                },
+            });
+            if (!response.ok) {
+                throw new Error("Failed to fetch links");
+            }
+            const data: LinksResponse = await response.json();
+            return data.data;
+        } catch {
+            // Fall back to mock data on error
+            console.warn("API request failed, using mock data");
         }
-        const data: LinksResponse = await response.json();
-        return data.data;
     }
 
-    // Return mock data if no API URL provided
+    // Return mock data if no API URL/key provided or on error
     return new Promise((resolve) => {
         setTimeout(() => resolve(mockLinks), 500);
     });
