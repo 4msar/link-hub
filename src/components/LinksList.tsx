@@ -27,14 +27,6 @@ const LinksList = () => {
         }
     }, [response, currentPage]);
 
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
-            </div>
-        );
-    }
-
     if (error) {
         return (
             <div className="text-center py-12">
