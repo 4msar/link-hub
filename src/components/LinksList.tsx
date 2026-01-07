@@ -11,15 +11,18 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination";
 
-const ITEMS_PER_PAGE = 5;
-
 const LinksList = () => {
-    const { data: links, isLoading, error } = useLinks();
     const [currentPage, setCurrentPage] = useState(1);
+    const {
+        data: response,
+        isLoading,
+        error,
+    } = useLinks({ page: currentPage });
 
     const totalPages = useMemo(() => {
-        return links ? Math.ceil(links.length / ITEMS_PER_PAGE) : 0;
-    }, [links]);
+        if (!response) return 0;
+        return Math.ceil(response.to / response.per_page);
+    }, [response]);
 
     const pageNumbers = useMemo(() => {
         return Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -44,7 +47,7 @@ const LinksList = () => {
         );
     }
 
-    if (!links || links.length === 0) {
+    if (!response || !response.data || response.data.length === 0) {
         return (
             <div className="text-center py-12">
                 <p className="text-muted-foreground">No links available</p>
@@ -52,9 +55,7 @@ const LinksList = () => {
         );
     }
 
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    const currentLinks = links.slice(startIndex, endIndex);
+    const links = response.data;
 
     const handlePageChange = (page: number) => {
         if (page >= 1 && page <= totalPages) {
@@ -65,8 +66,11 @@ const LinksList = () => {
     return (
         <div className="space-y-6">
             <div className="space-y-3">
-                {currentLinks.map((link, index) => (
-                    <LinkCard key={`${link.name}-${startIndex + index}`} link={link} />
+                {links.map((link, index) => (
+                    <LinkCard
+                        key={`${link.name}-${response.from + index}`}
+                        link={link}
+                    />
                 ))}
             </div>
 
@@ -75,8 +79,14 @@ const LinksList = () => {
                     <PaginationContent>
                         <PaginationItem>
                             <PaginationPrevious
-                                onClick={() => handlePageChange(currentPage - 1)}
-                                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                onClick={() =>
+                                    handlePageChange(currentPage - 1)
+                                }
+                                className={
+                                    !response.prev_page_url
+                                        ? "pointer-events-none opacity-50"
+                                        : "cursor-pointer"
+                                }
                             />
                         </PaginationItem>
 
@@ -94,8 +104,14 @@ const LinksList = () => {
 
                         <PaginationItem>
                             <PaginationNext
-                                onClick={() => handlePageChange(currentPage + 1)}
-                                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                onClick={() =>
+                                    handlePageChange(currentPage + 1)
+                                }
+                                className={
+                                    !response.next_page_url
+                                        ? "pointer-events-none opacity-50"
+                                        : "cursor-pointer"
+                                }
                             />
                         </PaginationItem>
                     </PaginationContent>

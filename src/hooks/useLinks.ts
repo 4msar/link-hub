@@ -1,64 +1,35 @@
 import { useQuery } from "@tanstack/react-query";
-import { LinksResponse, LinkItem } from "@/types/link";
+import { LinksResponse } from "@/types/link";
 import { apiKey, projectID } from "@/lib/constant";
 
-// Mock data for demonstration
-const mockLinks: LinkItem[] = [
-    { name: "My Portfolio", value: "https://myportfolio.com", type: "url" },
-    {
-        name: "Latest Blog Post",
-        value: "https://myblog.com/article",
-        type: "link",
-    },
-    { name: "Email Contact", value: "hello@example.com", type: "text" },
-    {
-        name: "GitHub Profile",
-        value: "https://github.com/username",
-        type: "url",
-    },
-    { name: "Twitter / X", value: "https://x.com/username", type: "link" },
-    { name: "Company Name", value: "Acme Corporation", type: "text" },
-    { name: "Documentation", value: "https://docs.example.com", type: "url" },
-    {
-        name: "Support Center",
-        value: "https://support.example.com/help",
-        type: "link",
-    },
-];
+const fetchLinks = async (
+    params: Record<string, string | number>
+): Promise<LinksResponse> => {
+    const queryParams = new URLSearchParams(
+        Object.entries(params).map(([key, value]) => [key, value.toString()])
+    ).toString();
 
-const fetchLinks = async (apiUrl?: string): Promise<LinkItem[]> => {
-    if (apiUrl && apiKey) {
-        try {
-            const response = await fetch(apiUrl, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${apiKey}`,
-                },
-            });
-            if (!response.ok) {
-                throw new Error("Failed to fetch links");
-            }
-            const data: LinksResponse = await response.json();
-            return data.data;
-        } catch {
-            // Fall back to mock data on error
-            console.warn("API request failed, using mock data");
+    const response = await fetch(
+        `https://kv.fourorbit.com/api/values/${projectID}?${queryParams}`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${apiKey}`,
+            },
         }
+    );
+    if (!response.ok) {
+        throw new Error("Failed to fetch links");
     }
-
-    // Return mock data if no API URL/key provided or on error
-    return new Promise((resolve) => {
-        setTimeout(() => resolve(mockLinks), 500);
-    });
+    const data: LinksResponse = await response.json();
+    return data;
 };
 
-export const useLinks = () => {
-    const apiUrl = `https://kv.fourorbit.com/api/values/${projectID}`;
-
+export const useLinks = (queryParams: Record<string, string | number> = {}) => {
     return useQuery({
-        queryKey: ["links", apiUrl],
-        queryFn: () => fetchLinks(apiUrl),
+        queryKey: ["links", queryParams],
+        queryFn: () => fetchLinks(queryParams),
         staleTime: 1000 * 60 * 5, // 5 minutes
     });
 };
