@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useLinks } from "@/hooks/useLinks";
 import LinkCard from "./LinkCard";
 import { Loader2 } from "lucide-react";
@@ -16,6 +16,14 @@ const ITEMS_PER_PAGE = 5;
 const LinksList = () => {
     const { data: links, isLoading, error } = useLinks();
     const [currentPage, setCurrentPage] = useState(1);
+
+    const totalPages = useMemo(() => {
+        return links ? Math.ceil(links.length / ITEMS_PER_PAGE) : 0;
+    }, [links]);
+
+    const pageNumbers = useMemo(() => {
+        return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }, [totalPages]);
 
     if (isLoading) {
         return (
@@ -44,7 +52,6 @@ const LinksList = () => {
         );
     }
 
-    const totalPages = Math.ceil(links.length / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
     const currentLinks = links.slice(startIndex, endIndex);
@@ -53,14 +60,6 @@ const LinksList = () => {
         if (page >= 1 && page <= totalPages) {
             setCurrentPage(page);
         }
-    };
-
-    const getPageNumbers = () => {
-        const pages: number[] = [];
-        for (let i = 1; i <= totalPages; i++) {
-            pages.push(i);
-        }
-        return pages;
     };
 
     return (
@@ -81,7 +80,7 @@ const LinksList = () => {
                             />
                         </PaginationItem>
 
-                        {getPageNumbers().map((page) => (
+                        {pageNumbers.map((page) => (
                             <PaginationItem key={page}>
                                 <PaginationLink
                                     onClick={() => handlePageChange(page)}
