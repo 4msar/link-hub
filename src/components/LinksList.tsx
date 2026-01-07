@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useLinks } from "@/hooks/useLinks";
 import LinkCard from "./LinkCard";
 import { Loader2 } from "lucide-react";
@@ -18,15 +18,6 @@ const LinksList = () => {
         isLoading,
         error,
     } = useLinks({ page: currentPage });
-
-    const totalPages = useMemo(() => {
-        if (!response) return 0;
-        return Math.ceil(response.to / response.per_page);
-    }, [response]);
-
-    const pageNumbers = useMemo(() => {
-        return Array.from({ length: totalPages }, (_, i) => i + 1);
-    }, [totalPages]);
 
     if (isLoading) {
         return (
@@ -57,12 +48,6 @@ const LinksList = () => {
 
     const links = response.data;
 
-    const handlePageChange = (page: number) => {
-        if (page >= 1 && page <= totalPages) {
-            setCurrentPage(page);
-        }
-    };
-
     return (
         <div className="space-y-6">
             <div className="space-y-3">
@@ -74,14 +59,12 @@ const LinksList = () => {
                 ))}
             </div>
 
-            {totalPages > 1 && (
+            {(response.prev_page_url || response.next_page_url) && (
                 <Pagination>
                     <PaginationContent>
                         <PaginationItem>
                             <PaginationPrevious
-                                onClick={() =>
-                                    handlePageChange(currentPage - 1)
-                                }
+                                onClick={() => setCurrentPage(currentPage - 1)}
                                 className={
                                     !response.prev_page_url
                                         ? "pointer-events-none opacity-50"
@@ -90,23 +73,9 @@ const LinksList = () => {
                             />
                         </PaginationItem>
 
-                        {pageNumbers.map((page) => (
-                            <PaginationItem key={page}>
-                                <PaginationLink
-                                    onClick={() => handlePageChange(page)}
-                                    isActive={currentPage === page}
-                                    className="cursor-pointer"
-                                >
-                                    {page}
-                                </PaginationLink>
-                            </PaginationItem>
-                        ))}
-
                         <PaginationItem>
                             <PaginationNext
-                                onClick={() =>
-                                    handlePageChange(currentPage + 1)
-                                }
+                                onClick={() => setCurrentPage(currentPage + 1)}
                                 className={
                                     !response.next_page_url
                                         ? "pointer-events-none opacity-50"
