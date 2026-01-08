@@ -54,9 +54,9 @@ const LinksList = () => {
                 ))}
             </div>
 
-            {isLoading && currentPage > 1 && (
+            {isLoading && (
                 <div className="flex items-center justify-center py-4">
-                    <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />
+                    <Loader2 className="w-8 h-8 text-muted-foreground animate-spin" />
                 </div>
             )}
 

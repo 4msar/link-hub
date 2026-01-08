@@ -30,7 +30,6 @@ export const useLinks = (queryParams: Record<string, string | number> = {}) => {
     return useQuery({
         queryKey: ["links", queryParams],
         queryFn: () => fetchLinks(queryParams),
-        keepPreviousData: true,
         staleTime: 1000 * 60 * 5, // 5 minutes
     });
 };
