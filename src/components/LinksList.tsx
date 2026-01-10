@@ -1,18 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLinks } from "@/hooks/useLinks";
 import LinkCard from "./LinkCard";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { LinkItem } from "@/types/link";
 
 const LinksList = () => {
     const [currentPage, setCurrentPage] = useState(1);
+    const [search, setSearch] = useState("");
+    const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
     const [allLinks, setAllLinks] = useState<LinkItem[]>([]);
+
     const {
         data: response,
         isLoading,
         error,
-    } = useLinks({ page: currentPage });
+    } = useLinks({ page: currentPage, search });
 
     useEffect(() => {
         if (response?.data) {
@@ -26,6 +30,14 @@ const LinksList = () => {
             });
         }
     }, [response, currentPage]);
+
+    const handleChange = (event) => {
+        clearTimeout(timer.current);
+
+        timer.current = setTimeout(() => {
+            setSearch(event.target.value);
+        }, 500);
+    };
 
     if (error) {
         return (
@@ -48,6 +60,12 @@ const LinksList = () => {
 
     return (
         <div className="space-y-6">
+            <Input
+                placeholder="Search here..."
+                type="search"
+                onChange={handleChange}
+            />
+
             <div className="space-y-3">
                 {allLinks.map((link, index) => (
                     <LinkCard key={`${link.name}-${index}`} link={link} />
