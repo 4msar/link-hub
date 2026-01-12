@@ -29,7 +29,7 @@ export default function Home() {
         <footer className="text-center mt-12">
           <p className="text-xs text-muted-foreground/60">
             Powered by{" "}
-            <a target="_blank" href="https://msar.me">
+            <a target="_blank" rel="noopener noreferrer" href="https://msar.me">
               Saiful Alam
             </a>
           </p>
