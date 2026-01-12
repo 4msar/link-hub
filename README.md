@@ -1,6 +1,6 @@
 # Pockets
 
-A simple link listing application.
+A simple link listing application built with Next.js.
 
 ## Project info
 
@@ -26,10 +26,10 @@ git clone https://github.com/4msar/link-hub.git
 cd link-hub
 
 # Step 3: Install the necessary dependencies.
-npm install or yarn install
+npm install
 
 # Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev or yarn dev
+npm run dev
 ```
 
 **Edit a file directly in GitHub**
@@ -50,8 +50,9 @@ npm run dev or yarn dev
 
 This project is built with:
 
-- Vite
+- Next.js 16
 - TypeScript
-- React
+- React 19
 - shadcn-ui
 - Tailwind CSS
+- TanStack Query
