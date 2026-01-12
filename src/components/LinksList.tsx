@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect, useRef } from "react";
 import { useLinks } from "@/hooks/useLinks";
 import LinkCard from "./LinkCard";
