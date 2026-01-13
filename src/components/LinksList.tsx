@@ -67,6 +67,8 @@ const LinksList = () => {
                 placeholder="Search here..."
                 type="search"
                 onChange={handleChange}
+                name="search"
+                className="max-w-full mx-auto"
             />
 
             <div className="space-y-3">
