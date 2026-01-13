@@ -1,24 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { LinksResponse } from "@/types/link";
-import { apiKey, projectID } from "@/lib/constant";
 
-const fetchLinks = async (
+export const fetchLinks = async (
     params: Record<string, string | number>
 ): Promise<LinksResponse> => {
     const queryParams = new URLSearchParams(
         Object.entries(params).map(([key, value]) => [key, value.toString()])
     ).toString();
 
-    const response = await fetch(
-        `https://kv.fourorbit.com/api/values/${projectID}?${queryParams}`,
-        {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${apiKey}`,
-            },
-        }
-    );
+    const response = await fetch(`/api/links?${queryParams}`);
     if (!response.ok) {
         throw new Error("Failed to fetch links");
     }

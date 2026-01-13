@@ -38,6 +38,7 @@ const LinksList = () => {
 
         timer.current = setTimeout(() => {
             setSearch(event.target.value);
+            setCurrentPage(1); // Reset to first page on new search
         }, 500);
     };
 
