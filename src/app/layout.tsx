@@ -1,5 +1,7 @@
 import { Providers } from "@/components/Providers";
+import { Nunito } from "next/font/google";
 import "@/app/globals.css";
+import { cn } from "@/lib/utils";
 
 export const metadata = {
     title: "Bookmarked Links",
@@ -18,6 +20,8 @@ export const metadata = {
     },
 };
 
+const fontFamily = Nunito({ subsets: ["latin"] });
+
 export default function RootLayout({
     children,
 }: {
@@ -25,7 +29,12 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <body>
+            <body
+                className={cn(
+                    fontFamily.className,
+                    "bg-background text-foreground dark:bg-dark-background dark:text-dark-foreground transition-colors"
+                )}
+            >
                 <Providers>{children}</Providers>
             </body>
         </html>

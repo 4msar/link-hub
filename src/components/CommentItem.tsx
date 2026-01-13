@@ -12,7 +12,7 @@ export const CommentItem = ({ comment }: CommentItemProps) => {
                 <MessageCircle className="w-4 h-4 text-muted-foreground" />
             </div>
             <div className="flex-1 min-w-0">
-                <p className="text-sm text-foreground break-words whitespace-pre-line">
+                <p className="text-sm font-medium text-foreground break-words whitespace-pre-line">
                     {comment.value}
                 </p>
                 {comment.name && (
