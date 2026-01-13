@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { MouseEvent, ReactNode } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { MouseEvent, ReactNode, useRef, startTransition } from "react";
 
 interface TransitionLinkProps {
     href: string;
@@ -12,23 +12,30 @@ interface TransitionLinkProps {
 
 export function TransitionLink({ href, children, className }: TransitionLinkProps) {
     const router = useRouter();
+    const pathname = usePathname();
 
     const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
-        e.preventDefault();
-        
+        // Don't handle if it's a modified click or same page
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || href === pathname) {
+            return;
+        }
+
         // Check if the browser supports View Transitions API
         if (typeof document !== 'undefined' && 'startViewTransition' in document) {
+            e.preventDefault();
+            
             (document as any).startViewTransition(() => {
-                router.push(href);
+                // Use React's startTransition to avoid showing loading state
+                startTransition(() => {
+                    router.push(href);
+                });
             });
-        } else {
-            // Fallback for browsers that don't support View Transitions
-            router.push(href);
         }
+        // For browsers without View Transitions, let Next.js Link handle it naturally
     };
 
     return (
-        <Link href={href} onClick={handleClick} className={className}>
+        <Link href={href} onClick={handleClick} className={className} prefetch>
             {children}
         </Link>
     );
