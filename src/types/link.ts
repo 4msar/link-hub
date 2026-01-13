@@ -15,3 +15,7 @@ export interface LinksResponse {
     prev_page_url: string | null;
     to: number;
 }
+
+export interface Comment extends Omit<LinkItem, "type"> {
+    type: string;
+}
