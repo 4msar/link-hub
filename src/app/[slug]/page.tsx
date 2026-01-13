@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, ArrowLeft, FileText, Link2 } from "lucide-react";
-import Link from "next/link";
+import { TransitionLink } from "@/components/TransitionLink";
 import { notFound } from "next/navigation";
 
 export default async function Page({
@@ -26,7 +26,7 @@ export default async function Page({
         <div className="min-h-screen bg-background">
             <div className="max-w-3xl mx-auto px-4 py-8">
                 {/* Back Button */}
-                <Link href="/">
+                <TransitionLink href="/">
                     <Button
                         variant="ghost"
                         size="sm"
@@ -35,7 +35,7 @@ export default async function Page({
                         <ArrowLeft className="w-4 h-4" />
                         Back to Links
                     </Button>
-                </Link>
+                </TransitionLink>
 
                 {/* Link Details Card */}
                 <Card className="mb-8">
