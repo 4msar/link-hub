@@ -18,6 +18,19 @@ export interface LinksResponse {
     to: number;
 }
 
+export interface ProjectDetails {
+    id: string | number;
+    name: string;
+    slug: string;
+    description?: string;
+    status: string;
+}
+
+export interface LinkDetailsResponse {
+    data: LinkItem;
+    project: ProjectDetails;
+}
+
 export interface Comment extends Omit<LinkItem, "type"> {
     type: string;
 }
