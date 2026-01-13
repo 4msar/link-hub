@@ -1,5 +1,7 @@
 export interface LinkItem {
+    id: string | number;
     name: string;
+    slug: string;
     value: string;
     type: "text" | "url" | "link";
 }
