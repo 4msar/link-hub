@@ -2,6 +2,9 @@ import { getLinks } from "@/lib/api";
 import { setCachedLinks, getCacheStats } from "@/lib/cache";
 import { type NextRequest } from "next/server";
 
+// Configuration
+const DEFAULT_CACHE_PAGE_SIZE = 100;
+
 /**
  * Cache refresh endpoint
  * This endpoint should be called by a cron job every hour to refresh the cache
@@ -28,7 +31,7 @@ export async function GET(request: NextRequest) {
         
         // Fetch fresh data from the third-party API
         // Fetch first page with reasonable per_page to cache a good amount of data
-        const freshData = await getLinks({ page: 1, per_page: 100 });
+        const freshData = await getLinks({ page: 1, per_page: DEFAULT_CACHE_PAGE_SIZE });
         
         // Update the cache
         setCachedLinks(freshData);
@@ -80,7 +83,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { page = 1, per_page = 100 } = body;
+        const { page = 1, per_page = DEFAULT_CACHE_PAGE_SIZE } = body;
         
         console.log(`[Cache Refresh] Starting cache refresh with params: page=${page}, per_page=${per_page}`);
         

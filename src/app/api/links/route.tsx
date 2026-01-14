@@ -2,6 +2,9 @@ import { getLinks } from "@/lib/api";
 import { getCachedLinks, setCachedLinks, isCacheStale } from "@/lib/cache";
 import { type NextRequest } from "next/server";
 
+// Configuration
+const DEFAULT_CACHE_PAGE_SIZE = 100;
+
 // Background revalidation flag to prevent multiple simultaneous requests
 let isRevalidating = false;
 
@@ -41,9 +44,10 @@ export async function GET(request: NextRequest) {
         );
 
         // Check if request is for page 1 without search (cacheable request)
-        const isCacheableRequest = 
-            (!queryParams.page || queryParams.page === "1" || queryParams.page === 1) &&
-            !queryParams.search;
+        const pageParam = queryParams.page;
+        const isFirstPage = !pageParam || pageParam === "1" || pageParam === 1;
+        const hasNoSearch = !queryParams.search;
+        const isCacheableRequest = isFirstPage && hasNoSearch;
 
         if (isCacheableRequest) {
             // Try to serve from cache

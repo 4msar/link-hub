@@ -22,6 +22,7 @@ const cache: CacheStore = {
 
 // Cache configuration
 const CACHE_TTL = 60 * 60 * 1000; // 1 hour in milliseconds
+const STALE_THRESHOLD = 0.83; // Consider cache stale after 83% of TTL
 
 /**
  * Get cached links data
@@ -60,8 +61,8 @@ export function isCacheStale(): boolean {
     const now = Date.now();
     const age = now - entry.timestamp;
     
-    // Consider cache stale if older than 50 minutes (83% of TTL)
-    return age > CACHE_TTL * 0.83;
+    // Consider cache stale if older than STALE_THRESHOLD of TTL
+    return age > CACHE_TTL * STALE_THRESHOLD;
 }
 
 /**
