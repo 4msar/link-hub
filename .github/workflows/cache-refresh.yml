@@ -15,6 +15,10 @@ jobs:
   refresh-cache:
     runs-on: ubuntu-latest
     
+    # Restrict permissions for security - this job only needs to make HTTP requests
+    permissions:
+      contents: none
+    
     steps:
       - name: Refresh Application Cache
         run: |
