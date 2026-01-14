@@ -56,3 +56,22 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 - TanStack Query
+
+## Features
+
+### Background Caching System
+
+This application includes an intelligent caching system that:
+- Caches API responses for faster page loads
+- Automatically refreshes cache in the background
+- Can be configured to run hourly via cron jobs
+- Reduces load on third-party APIs
+
+**Quick Start:**
+1. The cache works automatically when you run the app
+2. Set up hourly refresh using Vercel Cron (already configured) or GitHub Actions
+3. Monitor cache status at `/api/cache/status`
+
+**Documentation:**
+- See [CACHE_DOCUMENTATION.md](CACHE_DOCUMENTATION.md) for detailed setup instructions
+- See [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md) for technical details
