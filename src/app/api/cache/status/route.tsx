@@ -10,7 +10,7 @@ import { type NextRequest } from "next/server";
  */
 export async function GET(request: NextRequest) {
     try {
-        const stats = getCacheStats();
+        const stats = await getCacheStats();
         
         return new Response(
             JSON.stringify({

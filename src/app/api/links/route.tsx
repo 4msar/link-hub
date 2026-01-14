@@ -23,7 +23,7 @@ async function revalidateCache(queryParams: Record<string, string | number>) {
         console.log("[Links API] Starting background revalidation...");
         
         const freshData = await getLinks(queryParams);
-        setCachedLinks(freshData);
+        await setCachedLinks(freshData);
         
         console.log("[Links API] Background revalidation completed");
     } catch (error) {
@@ -51,13 +51,13 @@ export async function GET(request: NextRequest) {
 
         if (isCacheableRequest) {
             // Try to serve from cache
-            const cachedData = getCachedLinks();
+            const cachedData = await getCachedLinks();
             
             if (cachedData) {
                 console.log("[Links API] Serving from cache");
                 
                 // Check if cache is stale and trigger background revalidation
-                if (isCacheStale()) {
+                if (await isCacheStale()) {
                     console.log("[Links API] Cache is stale, triggering background revalidation");
                     // Don't await - let it run in background
                     revalidateCache(queryParams).catch(err => 
@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
             
             // Cache miss - fetch from API and cache the result
             const links = await getLinks(queryParams);
-            setCachedLinks(links);
+            await setCachedLinks(links);
             
             return new Response(JSON.stringify(links), {
                 status: 200,

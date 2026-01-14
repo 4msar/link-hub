@@ -91,9 +91,9 @@ export async function POST(request: NextRequest) {
         const freshData = await getLinks({ page, per_page });
         
         // Update the cache
-        setCachedLinks(freshData);
+        await setCachedLinks(freshData);
         
-        const stats = getCacheStats();
+        const stats = await getCacheStats();
         
         console.log("[Cache Refresh] Cache refreshed successfully");
         

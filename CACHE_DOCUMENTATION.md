@@ -3,7 +3,7 @@
 ## Overview
 
 This application implements a background cache system that:
-- Caches API responses from the third-party link service
+- Caches API responses from the third-party link service using Redis
 - Serves cached data for faster response times
 - Automatically revalidates stale cache in the background
 - Can be refreshed hourly via cron job
@@ -13,9 +13,10 @@ This application implements a background cache system that:
 ### Components
 
 1. **Cache Module** (`src/lib/cache.ts`)
-   - In-memory cache storage
+   - Redis-based persistent cache storage
    - TTL-based expiration (1 hour)
    - Cache statistics and management functions
+   - Automatic connection management
 
 2. **API Routes**
    - `/api/links` - Main links endpoint with cache integration
@@ -24,10 +25,10 @@ This application implements a background cache system that:
 
 ### How It Works
 
-1. **Initial Request**: When `/api/links` is called, it checks the cache first
+1. **Initial Request**: When `/api/links` is called, it checks Redis cache first
 2. **Cache Hit**: If valid cache exists, return immediately with `X-Cache-Status: HIT`
 3. **Stale Cache**: If cache is stale (>50 minutes old), serve it but trigger background revalidation
-4. **Cache Miss**: If no cache exists, fetch from API, cache the result, return with `X-Cache-Status: MISS`
+4. **Cache Miss**: If no cache exists, fetch from API, cache in Redis, return with `X-Cache-Status: MISS`
 5. **Hourly Refresh**: External cron job calls `/api/cache/refresh` to update cache
 
 ## Cache Behavior
@@ -36,6 +37,37 @@ This application implements a background cache system that:
 - **Stale Threshold**: 50 minutes (cache is considered stale after this)
 - **Cacheable Requests**: Only page 1 requests without search parameters
 - **Non-cacheable**: Pagination (page > 1) and search requests bypass cache
+- **Storage**: Redis for persistent, distributed caching
+
+## Redis Setup
+
+### Environment Variable
+
+Add the Redis connection URL to your environment variables:
+
+```env
+REDIS_URL=redis://localhost:6379
+```
+
+For production deployments, use your Redis provider's connection URL. Popular options include:
+
+- **Upstash Redis**: `redis://default:****@*******.upstash.io:6379`
+- **Redis Cloud**: `redis://default:****@*******.redis.cloud:6379`
+- **Railway**: `redis://:****@*******.railway.app:6379`
+- **Vercel KV**: Use `@vercel/kv` instead (requires different setup)
+
+### Local Development
+
+For local development, you can run Redis using Docker:
+
+```bash
+docker run -d -p 6379:6379 redis:alpine
+```
+
+Or install Redis locally:
+- **macOS**: `brew install redis && brew services start redis`
+- **Ubuntu/Debian**: `sudo apt-get install redis-server`
+- **Windows**: Use WSL2 or Docker
 
 ## Setting Up Hourly Cron Job
 
@@ -223,39 +255,42 @@ Monitor these metrics to ensure optimal cache performance:
 1. **Cache Hit Rate**: Percentage of requests served from cache
 2. **Cache Age**: How old the cache is (check via `/api/cache/status`)
 3. **Revalidation Success**: Monitor logs for successful background revalidations
+4. **Redis Connection**: Monitor Redis connection health and latency
 
 ### Logs
 
 The cache system logs important events:
+- `[Redis] Connected successfully`
+- `[Redis] Cache updated successfully`
 - `[Cache Refresh] Starting cache refresh...`
 - `[Cache Refresh] Cache refreshed successfully`
 - `[Links API] Serving from cache`
 - `[Links API] Cache is stale, triggering background revalidation`
 - `[Links API] Cache miss, fetching from API`
 
-## Limitations
+## Benefits of Redis Cache
 
-### In-Memory Cache Limitations
+### Advantages Over In-Memory Cache
 
-The current implementation uses in-memory caching, which has limitations:
+1. **Persistent Storage**: 
+   - Cache survives server restarts and redeployments
+   - Works perfectly in serverless environments (Vercel, AWS Lambda)
+   - No cold start cache misses
 
-1. **Serverless Environments**: 
-   - Cache is lost between function invocations
-   - May not be effective on platforms like Vercel's serverless functions
-   - Best suited for long-running server processes
+2. **Distributed Caching**:
+   - Shared cache across all instances
+   - Perfect for multi-instance deployments
+   - High cache hit rate regardless of load balancing
 
-2. **Multi-Instance Deployments**:
-   - Each instance has its own cache
-   - No shared cache between instances
+3. **Scalability**:
+   - Can handle high traffic with ease
+   - Redis clusters for even more performance
+   - Built-in eviction policies
 
-### Recommended Improvements for Production
-
-For production use with serverless or multi-instance deployments, consider:
-
-1. **Redis Cache**: Use Redis for shared, persistent cache
-2. **Vercel KV**: Use Vercel's key-value store for edge caching
-3. **CDN Caching**: Use CDN-level caching with proper cache headers
-4. **Database Cache**: Store cache in a database (PostgreSQL, MongoDB, etc.)
+4. **Production Ready**:
+   - Battle-tested in production environments
+   - Reliable and fast
+   - Easy to monitor and debug
 
 ## Troubleshooting
 
@@ -264,7 +299,18 @@ For production use with serverless or multi-instance deployments, consider:
 1. Check cache status: `GET /api/cache/status`
 2. Verify cache refresh endpoint works: `GET /api/cache/refresh`
 3. Check server logs for error messages
-4. Ensure environment variables are set correctly
+4. Ensure REDIS_URL environment variable is set correctly
+5. Verify Redis server is running and accessible
+
+### Redis Connection Issues
+
+If you see Redis connection errors:
+
+1. Verify REDIS_URL is correct
+2. Check Redis server is running: `redis-cli ping` (should return PONG)
+3. Ensure network connectivity to Redis server
+4. Check firewall rules if using remote Redis
+5. Verify authentication credentials if required
 
 ### High API Usage
 
@@ -273,7 +319,7 @@ If you notice high API usage despite caching:
 1. Verify cron job is running correctly
 2. Check cache expiration time
 3. Monitor for cache bypass scenarios (pagination, search)
-4. Consider implementing Redis for serverless environments
+4. Check Redis memory usage and eviction policy
 
 ### Stale Data
 
@@ -282,6 +328,7 @@ If data appears stale:
 1. Manually trigger cache refresh: `GET /api/cache/refresh`
 2. Verify cron job schedule
 3. Check cache TTL settings in `src/lib/cache.ts`
+4. Verify Redis TTL is set correctly
 
 ## Configuration
 

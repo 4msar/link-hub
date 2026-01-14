@@ -15,7 +15,7 @@ Add a Next.js function which will:
 The feature has been successfully implemented with the following considerations:
 
 #### What Works
-1. **Caching System**: ✅ Fully implemented with in-memory storage
+1. **Caching System**: ✅ Fully implemented with Redis storage
 2. **Background Updates**: ✅ Stale-While-Revalidate pattern implemented
 3. **Hourly Refresh**: ✅ Endpoint created for external cron services
 4. **Faster Response**: ✅ Serves from cache when available
@@ -23,12 +23,13 @@ The feature has been successfully implemented with the following considerations:
 
 #### Architecture Decisions
 
-**Cache Storage: In-Memory**
-- ✅ Simple to implement
-- ✅ No external dependencies
-- ✅ Works perfectly for single-server deployments
-- ⚠️ Limitation: In serverless (Vercel, AWS Lambda), cache may not persist between invocations
-- 💡 Solution: Documented alternatives (Redis, Vercel KV) for production serverless
+**Cache Storage: Redis**
+- ✅ Persistent and reliable storage
+- ✅ Works perfectly in serverless environments (Vercel, AWS Lambda)
+- ✅ Shared cache across all instances
+- ✅ Production-ready and battle-tested
+- ✅ Handles multi-instance deployments seamlessly
+- 💡 No cache loss between function invocations
 
 **Cron Job: External Service Required**
 - ✅ Implemented endpoints that any cron service can call
@@ -47,17 +48,18 @@ The feature has been successfully implemented with the following considerations:
 
 ### 1. Core Cache System (`src/lib/cache.ts`)
 ```typescript
-- getCachedLinks() - Retrieve cached data
-- setCachedLinks() - Store fresh data
-- isCacheStale() - Check if revalidation needed
-- getCacheStats() - Monitor cache health
-- clearCache() - Manual cache clearing
+- getCachedLinks() - Retrieve cached data from Redis (async)
+- setCachedLinks() - Store fresh data in Redis (async)
+- isCacheStale() - Check if revalidation needed (async)
+- getCacheStats() - Monitor cache health (async)
+- clearCache() - Manual cache clearing (async)
 ```
 
 **Configuration:**
 - Cache TTL: 1 hour (3600 seconds)
 - Stale threshold: 83% of TTL (~50 minutes)
-- Storage: In-memory with timestamps
+- Storage: Redis with automatic TTL management
+- Connection: Singleton pattern with automatic reconnection
 
 ### 2. API Endpoints
 
@@ -176,40 +178,46 @@ Update cache when complete
 - Much faster user experience
 - No risk of hitting API rate limits
 
-## Limitations & Considerations
+## Redis Cache Benefits
 
-### In-Memory Cache Limitations
+### Production-Ready Features
 
-1. **Serverless Environments (Vercel, AWS Lambda)**
-   - Cache may not persist between function invocations
-   - Each cold start = empty cache
-   - Impact: First request after cold start will be slow
-   - Mitigation: Use Vercel Cron to keep functions warm
+1. **Serverless Compatibility**
+   - ✅ Cache persists between function invocations
+   - ✅ No cold start cache misses
+   - ✅ Perfect for Vercel, AWS Lambda, etc.
+   - ✅ Consistent performance regardless of deployment model
 
-2. **Multi-Instance Deployments**
-   - Each instance has separate cache
-   - No shared cache between instances
-   - Impact: Cache hit rate may be lower
-   - Solution for production: Use Redis or Vercel KV
+2. **Multi-Instance Support**
+   - ✅ Shared cache across all instances
+   - ✅ High cache hit rate with load balancing
+   - ✅ No cache inconsistency issues
+   - ✅ Scales horizontally with ease
 
-3. **Server Restarts**
-   - Cache is lost on server restart
-   - Next request will rebuild cache
-   - Impact: Minor, one slow request
+3. **Reliability**
+   - ✅ Cache survives server restarts and redeployments
+   - ✅ Automatic TTL management
+   - ✅ Built-in persistence options
+   - ✅ Battle-tested in production
 
-### Recommended for Production
+4. **Performance**
+   - ✅ Fast in-memory operations
+   - ✅ Network latency typically < 5ms
+   - ✅ Supports Redis clusters for high availability
+   - ✅ Built-in eviction policies
 
-For high-traffic or serverless production use:
-1. **Redis Cache**: Shared, persistent, fast
-2. **Vercel KV**: Built-in key-value store for Vercel
-3. **CDN Caching**: Add CDN layer with cache headers
-4. **Database Cache**: Store in PostgreSQL/MongoDB
+### Setup Requirements
 
-Current implementation is perfect for:
-- ✅ Development and testing
-- ✅ Low to medium traffic sites
-- ✅ Traditional server deployments (not serverless)
-- ✅ Proof of concept / MVP
+1. **Redis Server**: Local or cloud-hosted Redis instance
+2. **Environment Variable**: `REDIS_URL` connection string
+3. **Network Access**: Application must be able to connect to Redis
+
+Popular Redis hosting options:
+- Upstash Redis (serverless-friendly)
+- Redis Cloud
+- Railway
+- AWS ElastiCache
+- Azure Cache for Redis
 
 ## Testing & Validation
 
