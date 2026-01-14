@@ -13,6 +13,7 @@ const LinksList = () => {
     const [search, setSearch] = useState("");
     const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
     const [allLinks, setAllLinks] = useState<LinkItem[]>([]);
+    const observerTarget = useRef<HTMLDivElement>(null);
 
     const {
         data: response,
@@ -42,24 +43,30 @@ const LinksList = () => {
         }, 500);
     };
 
-    if (error) {
-        return (
-            <div className="text-center py-12">
-                <p className="text-muted-foreground">Failed to load links</p>
-                <p className="text-sm text-muted-foreground/70 mt-1">
-                    Please try again later
-                </p>
-            </div>
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (
+                    entry.isIntersecting &&
+                    response?.next_page_url &&
+                    !isLoading
+                ) {
+                    setCurrentPage((prev) => prev + 1);
+                }
+            },
+            { threshold: 0.1 }
         );
-    }
 
-    if (!isLoading && allLinks.length === 0) {
-        return (
-            <div className="text-center py-12">
-                <p className="text-muted-foreground">No links available</p>
-            </div>
-        );
-    }
+        if (observerTarget.current) {
+            observer.observe(observerTarget.current);
+        }
+
+        return () => {
+            if (observerTarget.current) {
+                observer.unobserve(observerTarget.current);
+            }
+        };
+    }, [response?.next_page_url, isLoading]);
 
     return (
         <div className="space-y-6">
@@ -71,11 +78,30 @@ const LinksList = () => {
                 className="max-w-full mx-auto"
             />
 
-            <div className="space-y-3">
-                {allLinks.map((link, index) => (
-                    <LinkCard key={`${link.name}-${index}`} link={link} />
-                ))}
-            </div>
+            {error && (
+                <div className="text-center py-12">
+                    <p className="text-muted-foreground">
+                        Failed to load links
+                    </p>
+                    <p className="text-sm text-muted-foreground/70 mt-1">
+                        Please try again later
+                    </p>
+                </div>
+            )}
+
+            {!isLoading && allLinks.length === 0 && (
+                <div className="text-center py-12">
+                    <p className="text-muted-foreground">No links available</p>
+                </div>
+            )}
+
+            {allLinks.length > 0 && (
+                <div className="space-y-3">
+                    {allLinks.map((link, index) => (
+                        <LinkCard key={`${link.name}-${index}`} link={link} />
+                    ))}
+                </div>
+            )}
 
             {isLoading && (
                 <div className="flex items-center justify-center py-4">
@@ -83,17 +109,8 @@ const LinksList = () => {
                 </div>
             )}
 
-            {response?.next_page_url && !isLoading && (
-                <div className="flex justify-center">
-                    <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        variant="outline"
-                        className="w-full sm:w-auto"
-                    >
-                        Load More
-                    </Button>
-                </div>
-            )}
+            {/* Infinite scroll trigger */}
+            <div ref={observerTarget} className="h-4" />
         </div>
     );
 };
