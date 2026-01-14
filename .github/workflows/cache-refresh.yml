@@ -1,0 +1,36 @@
+name: Cache Refresh Cron Job
+
+on:
+  schedule:
+    # Run every hour at minute 0
+    - cron: '0 * * * *'
+  workflow_dispatch: # Allow manual trigger from GitHub Actions UI
+
+jobs:
+  refresh-cache:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Refresh Application Cache
+        run: |
+          # Replace with your actual deployed URL
+          # For example: https://pockets.msar.me/api/cache/refresh
+          RESPONSE=$(curl -s -w "\n%{http_code}" https://pockets.msar.me/api/cache/refresh)
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | head -n-1)
+          
+          echo "HTTP Status Code: $HTTP_CODE"
+          echo "Response Body: $BODY"
+          
+          if [ "$HTTP_CODE" -ne 200 ]; then
+            echo "Cache refresh failed with status code: $HTTP_CODE"
+            exit 1
+          fi
+          
+          echo "Cache refreshed successfully!"
+      
+      - name: Notify on Failure
+        if: failure()
+        run: |
+          echo "Cache refresh failed. Please check the application logs."
+          # You can add notification logic here (e.g., send to Slack, email, etc.)
