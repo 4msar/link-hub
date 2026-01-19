@@ -1,6 +1,6 @@
 import { Providers } from "@/components/Providers";
 import { Nunito } from "next/font/google";
-import "@/app/globals.css";
+import "./globals.css";
 import { cn } from "@/lib/utils";
 
 export const metadata = {
@@ -32,7 +32,7 @@ export default function RootLayout({
             <body
                 className={cn(
                     fontFamily.className,
-                    "bg-background text-foreground dark:bg-dark-background dark:text-dark-foreground transition-colors"
+                    "bg-background text-foreground dark:bg-dark-background dark:text-dark-foreground transition-colors",
                 )}
             >
                 <Providers>{children}</Providers>

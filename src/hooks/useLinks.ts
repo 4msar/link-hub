@@ -2,10 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { LinksResponse } from "@/types/link";
 
 export const fetchLinks = async (
-    params: Record<string, string | number>
+    params: Record<string, string | number>,
 ): Promise<LinksResponse> => {
     const queryParams = new URLSearchParams(
-        Object.entries(params).map(([key, value]) => [key, value.toString()])
+        Object.entries(params)
+            .filter(([_, value]) => value)
+            .map(([key, value]) => [key, value.toString()]),
     ).toString();
 
     const response = await fetch(`/api/links?${queryParams}`);

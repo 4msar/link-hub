@@ -16,10 +16,12 @@ import {
 } from "./constant";
 
 export const getLinks = async (
-    params: Record<string, string | number>
+    params: Record<string, string | number>,
 ): Promise<LinksResponse> => {
     const queryParams = new URLSearchParams(
-        Object.entries(params).map(([key, value]) => [key, value.toString()])
+        Object.entries(params)
+            .filter(([_, value]) => value)
+            .map(([key, value]) => [key, value.toString()]),
     ).toString();
 
     const response = await fetch(
@@ -32,7 +34,7 @@ export const getLinks = async (
             },
             cache: "force-cache",
             next: { revalidate: LONG_CACHE_DURATION },
-        } as RequestInit
+        } as RequestInit,
     );
 
     if (!response.ok) {
@@ -44,7 +46,7 @@ export const getLinks = async (
 };
 
 export const getLinkBySlug = async (
-    slug: string
+    slug: string,
 ): Promise<LinkDetailsResponse> => {
     const response = await fetch(
         `${BASE_API_URL}/values/${projectID}/${slug}`,
@@ -56,7 +58,7 @@ export const getLinkBySlug = async (
             },
             cache: "force-cache",
             next: { revalidate: VERY_LONG_CACHE_DURATION },
-        } as RequestInit
+        } as RequestInit,
     );
 
     if (!response.ok) {
@@ -78,7 +80,7 @@ export const getComments = async (id: string): Promise<LinksResponse> => {
             },
             cache: "force-cache",
             next: { revalidate: MEDIUM_CACHE_DURATION },
-        } as RequestInit
+        } as RequestInit,
     );
 
     if (!response.ok) {
@@ -92,7 +94,7 @@ export const getComments = async (id: string): Promise<LinksResponse> => {
 export const postComment = async (
     linkId: string | number,
     name: string,
-    comment: string
+    comment: string,
 ): Promise<unknown> => {
     const response = await fetch(
         `${BASE_API_URL}/values/${commentsProjectID}`,
@@ -108,7 +110,7 @@ export const postComment = async (
                 slug: `comment-${Date.now()}`,
                 type: `comment:${linkId}`,
             }),
-        }
+        },
     );
 
     if (!response.ok) {
