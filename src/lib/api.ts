@@ -115,3 +115,41 @@ export const postComment = async (
 
     return response.json();
 };
+
+export const createLink = async (data: {
+    name: string;
+    slug: string;
+    value: string;
+    type: "text" | "url" | "link";
+}): Promise<unknown> => {
+    const response = await fetch(`${BASE_API_URL}/values/${projectID}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Error creating link: ${response.statusText}`);
+    }
+
+    return response.json();
+};
+
+export const getLinkMetaData = async (
+    url: string,
+): Promise<{
+    title: string;
+    description: string;
+    image: string;
+}> => {
+    const response = await fetch(`https://meta.msar.me/?url=${url}`);
+
+    if (!response.ok) {
+        throw new Error(`Error fetching link metadata: ${response.statusText}`);
+    }
+
+    return response.json();
+};
