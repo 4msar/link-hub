@@ -1,5 +1,4 @@
 import { getLinks } from "@/lib/api";
-import { VERY_LONG_CACHE_DURATION } from "@/lib/constant";
 import { type NextRequest } from "next/server";
 
 // Cache duration for this route
@@ -21,7 +20,7 @@ export async function GET(request: NextRequest) {
             status: 200,
             headers: {
                 "Content-Type": "application/json",
-                "Cache-Control": `public, max-age=${VERY_LONG_CACHE_DURATION}`,
+                "Cache-Control": `public, max-age=${revalidate}`,
             },
         });
     } catch (error) {

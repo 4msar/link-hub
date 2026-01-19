@@ -1,5 +1,4 @@
 import { getComments } from "@/lib/api";
-import { MEDIUM_CACHE_DURATION } from "@/lib/constant";
 
 // Cache duration for this route
 export const revalidate = 300;
@@ -17,7 +16,7 @@ export async function GET(
             status: 200,
             headers: {
                 "Content-Type": "application/json",
-                "Cache-Control": `public, max-age=${MEDIUM_CACHE_DURATION}`,
+                "Cache-Control": `public, max-age=${revalidate}`,
             },
         });
     } catch (error) {
