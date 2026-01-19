@@ -9,18 +9,22 @@ The API routes in this application use Next.js standard caching methodology to i
 The following GET routes are cached with automatic revalidation:
 
 ### `/api/route.tsx`
+
 - **Cache Duration**: 60 seconds
 - **Description**: Basic hello world endpoint
 
 ### `/api/links/route.tsx`
+
 - **Cache Duration**: 60 seconds
 - **Description**: Returns list of links with optional query parameters
 
 ### `/api/details/[slug]/route.tsx`
+
 - **Cache Duration**: 60 seconds
 - **Description**: Returns details for a specific link by slug
 
 ### `/api/comments/[id]/route.tsx`
+
 - **Cache Duration**: 30 seconds
 - **Description**: Returns comments for a specific link ID
 
@@ -31,44 +35,46 @@ You can manually revalidate cached paths using the revalidation endpoint:
 ### `POST /api/revalidate`
 
 **Request Body:**
+
 ```json
+// query parameters
 {
-  "path": "/api/links",
-  "type": "page"
+    "path": "/api/links",
+    "type": "page"
 }
 ```
 
 **Parameters:**
+
 - `path` (required): The path to revalidate (e.g., "/api/links", "/slug-name")
 - `type` (optional): Either "page" or "layout" (defaults to "page")
 
 **Success Response (200):**
+
 ```json
 {
-  "revalidated": true,
-  "path": "/api/links",
-  "now": 1234567890
+    "revalidated": true,
+    "path": "/api/links",
+    "now": 1234567890
 }
 ```
 
 **Error Response (400):**
+
 ```json
 {
-  "error": "Missing path parameter"
+    "error": "Missing path parameter"
 }
 ```
 
 **Example Usage:**
+
 ```bash
 # Revalidate the links API cache
-curl -X POST http://localhost:3000/api/revalidate \
-  -H "Content-Type: application/json" \
-  -d '{"path": "/api/links"}'
+curl -X GET https://pockets.msar.me/api/revalidate?path=/api/links
 
 # Revalidate a specific link detail page
-curl -X POST http://localhost:3000/api/revalidate \
-  -H "Content-Type: application/json" \
-  -d '{"path": "/my-link-slug", "type": "page"}'
+curl -X GET https://pockets.msar.me/api/revalidate?path=/some-slug-name&tag=/some-slug-name
 ```
 
 ## How Caching Works
