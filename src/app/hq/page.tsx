@@ -14,6 +14,8 @@ import {
 import { toast } from "sonner";
 import { Loader2, LogOut } from "lucide-react";
 import { getLinkMetaData } from "@/lib/api";
+import Link from "next/link";
+import { TransitionLink } from "@/components/TransitionLink";
 
 const ADMIN_PIN_KEY = "admin_pin";
 
@@ -179,7 +181,7 @@ export default function AdminPage() {
                                 <Label htmlFor="pin">PIN</Label>
                                 <Input
                                     id="pin"
-                                    type="password"
+                                    type="number"
                                     value={pin}
                                     onChange={(e) => setPin(e.target.value)}
                                     placeholder="Enter admin PIN"
@@ -211,7 +213,19 @@ export default function AdminPage() {
     return (
         <div className="min-h-screen p-4 md:p-8">
             <div className="max-w-2xl mx-auto">
-                <div className="flex justify-end mb-4">
+                <div className="flex justify-between flex-wrap gap-2 mb-4">
+                    <div className="flex items-center gap-2">
+                        <TransitionLink
+                            href="/hq"
+                            className="text-2xl font-bold"
+                        >
+                            Admin Panel
+                        </TransitionLink>
+                        <span> | </span>
+                        <TransitionLink href="/" className="text-2xl font-bold">
+                            Home
+                        </TransitionLink>
+                    </div>
                     <Button
                         variant="outline"
                         onClick={handleLogout}
