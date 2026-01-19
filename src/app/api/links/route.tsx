@@ -2,7 +2,7 @@ import { getLinks } from "@/lib/api";
 import { type NextRequest } from "next/server";
 
 // Cache duration for this route
-export const revalidate = 3600; // 1 hour
+export const revalidate = 1800; // 30 minutes
 
 export async function GET(request: NextRequest) {
     try {

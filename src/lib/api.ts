@@ -51,6 +51,10 @@ export const getLinkBySlug = async (
                 Authorization: `Bearer ${apiKey}`,
             },
             cache: "force-cache",
+            next: {
+                tags: ["/api/links"],
+                revalidate: 3600, // 1 hour
+            },
         } as RequestInit,
     );
 
