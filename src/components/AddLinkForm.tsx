@@ -8,6 +8,17 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { getLinkMetaData } from "@/lib/api";
 
+// Helper function to convert text to URL-friendly slug
+const slugify = (text: string): string => {
+    return text
+        .toLowerCase() // Convert to lowercase
+        .trim() // Trim whitespace from start and end
+        .replace(/\s+/g, "-") // Replace spaces with hyphens
+        .replace(/[^\w-]+/g, "") // Remove non-word characters (except hyphens)
+        .replace(/-+/g, "-") // Remove duplicate hyphens
+        .replace(/^-+|-+$/g, ""); // Trim hyphens from start and end
+};
+
 export const AddLinkForm = ({ pin }: { pin: string }) => {
     // Form state
     const [name, setName] = useState("");
@@ -67,6 +78,13 @@ export const AddLinkForm = ({ pin }: { pin: string }) => {
             setName("");
         }
     }, [value]);
+
+    // Auto-generate slug from name
+    useEffect(() => {
+        if (name) {
+            setSlug(slugify(name));
+        }
+    }, [name]);
 
     return (
         <form onSubmit={handleAddLink} className="space-y-4">
