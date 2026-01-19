@@ -32,7 +32,7 @@ export const LinkCardBar = ({ link }: LinkCardProps) => {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <div className="flex items-center gap-1.5 shrink-0">
                         <TooltipTitle title="View discussion">
                             <TransitionLink
                                 href={link.slug}

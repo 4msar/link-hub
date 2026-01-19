@@ -41,7 +41,7 @@ export default async function Page({
                 <Card className="mb-8">
                     <CardHeader className="space-y-4">
                         <div className="flex items-start gap-4">
-                            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary flex items-center justify-center">
+                            <div className="shrink-0 w-12 h-12 rounded-xl bg-primary flex items-center justify-center">
                                 {isUrl ? (
                                     <Link2 className="w-6 h-6 text-primary-foreground" />
                                 ) : (
@@ -72,10 +72,10 @@ export default async function Page({
                                         className="flex items-center gap-2 text-primary hover:underline break-all"
                                     >
                                         {link.value}
-                                        <ExternalLink className="w-4 h-4 flex-shrink-0" />
+                                        <ExternalLink className="w-4 h-4 shrink-0" />
                                     </a>
                                 ) : (
-                                    <p className="text-foreground break-words whitespace-pre-wrap">
+                                    <p className="text-foreground wrap-break-word whitespace-pre-wrap">
                                         {link.value}
                                     </p>
                                 )}
