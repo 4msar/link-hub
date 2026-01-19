@@ -2,9 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { LinksResponse } from "@/types/link";
 
 export const fetchComments = async (
-    id: string | number
+    id: string | number,
 ): Promise<LinksResponse> => {
-    const response = await fetch(`/api/comments/${id}`);
+    const response = await fetch(`/api/comments/${id}`, {
+        method: "GET",
+        next: { revalidate: 300 }, // Revalidate every 5 minutes
+    });
     if (!response.ok) {
         throw new Error("Failed to fetch comments");
     }

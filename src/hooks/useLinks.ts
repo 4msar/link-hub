@@ -10,7 +10,10 @@ export const fetchLinks = async (
             .map(([key, value]) => [key, value.toString()]),
     ).toString();
 
-    const response = await fetch(`/api/links?${queryParams}`);
+    const response = await fetch(`/api/links?${queryParams}`, {
+        method: "GET",
+        next: { revalidate: 3600 }, // Revalidate every 1 hour
+    });
     if (!response.ok) {
         throw new Error("Failed to fetch links");
     }

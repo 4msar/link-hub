@@ -5,12 +5,7 @@
  * This modules should only use in backend/server-side code.
  */
 import { LinkDetailsResponse, LinksResponse } from "@/types/link";
-import {
-    apiKey,
-    BASE_API_URL,
-    commentsProjectID,
-    projectID,
-} from "./constant";
+import { apiKey, BASE_API_URL, commentsProjectID, projectID } from "./constant";
 
 export const getLinks = async (
     params: Record<string, string | number>,
@@ -51,6 +46,7 @@ export const getLinkBySlug = async (
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${apiKey}`,
             },
+            cache: "force-cache",
         } as RequestInit,
     );
 

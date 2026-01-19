@@ -1,7 +1,7 @@
 import { getComments } from "@/lib/api";
 
 // Cache duration for this route
-export const revalidate = 300;
+export const revalidate = 300; // 5 minutes
 
 export async function GET(
     request: Request,

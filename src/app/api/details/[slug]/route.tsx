@@ -1,7 +1,7 @@
 import { getLinkBySlug } from "@/lib/api";
 
 // Cache duration for this route
-export const revalidate = 86400;
+export const revalidate = 86400; // 24 hours
 
 export async function GET(
     request: Request,
