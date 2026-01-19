@@ -1,5 +1,8 @@
 import { getLinkBySlug } from "@/lib/api";
 
+// Cache this route for 60 seconds
+export const revalidate = 60;
+
 export async function GET(
     request: Request,
     { params }: RouteContext<"/api/details/[slug]">

@@ -22,7 +22,8 @@ export const getLinks = async (
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${apiKey}`,
             },
-        }
+            next: { revalidate: 60 }, // Cache for 60 seconds
+        } as RequestInit
     );
 
     if (!response.ok) {
@@ -44,7 +45,8 @@ export const getLinkBySlug = async (
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${apiKey}`,
             },
-        }
+            next: { revalidate: 60 }, // Cache for 60 seconds
+        } as RequestInit
     );
 
     if (!response.ok) {
@@ -64,7 +66,8 @@ export const getComments = async (id: string): Promise<LinksResponse> => {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${apiKey}`,
             },
-        }
+            next: { revalidate: 30 }, // Cache for 30 seconds
+        } as RequestInit
     );
 
     if (!response.ok) {

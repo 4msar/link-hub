@@ -1,5 +1,8 @@
 import { getComments } from "@/lib/api";
 
+// Cache this route for 30 seconds
+export const revalidate = 30;
+
 export async function GET(
     request: Request,
     { params }: RouteContext<"/api/comments/[id]">
