@@ -9,10 +9,7 @@ import {
     apiKey,
     BASE_API_URL,
     commentsProjectID,
-    LONG_CACHE_DURATION,
-    MEDIUM_CACHE_DURATION,
     projectID,
-    VERY_LONG_CACHE_DURATION,
 } from "./constant";
 
 export const getLinks = async (
@@ -32,8 +29,6 @@ export const getLinks = async (
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${apiKey}`,
             },
-            cache: "force-cache",
-            next: { revalidate: LONG_CACHE_DURATION },
         } as RequestInit,
     );
 
@@ -56,8 +51,6 @@ export const getLinkBySlug = async (
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${apiKey}`,
             },
-            cache: "force-cache",
-            next: { revalidate: VERY_LONG_CACHE_DURATION },
         } as RequestInit,
     );
 
@@ -78,8 +71,6 @@ export const getComments = async (id: string): Promise<LinksResponse> => {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${apiKey}`,
             },
-            cache: "force-cache",
-            next: { revalidate: MEDIUM_CACHE_DURATION },
         } as RequestInit,
     );
 
