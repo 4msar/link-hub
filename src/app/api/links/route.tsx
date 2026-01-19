@@ -1,6 +1,9 @@
 import { getLinks } from "@/lib/api";
 import { type NextRequest } from "next/server";
 
+// Cache this route for 60 seconds
+export const revalidate = 60;
+
 export async function GET(request: NextRequest) {
     try {
         const searchParams = request.nextUrl.searchParams;
