@@ -24,6 +24,10 @@ export const getLinks = async (
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${apiKey}`,
             },
+            next: {
+                revalidate: 3600, // 1 hour
+                tags: ["/api/links"],
+            },
         } as RequestInit,
     );
 
@@ -67,6 +71,7 @@ export const getComments = async (id: string): Promise<LinksResponse> => {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${apiKey}`,
             },
+            cache: "no-store",
         } as RequestInit,
     );
 
