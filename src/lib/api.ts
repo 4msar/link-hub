@@ -143,13 +143,32 @@ export const getLinkMetaData = async (
 ): Promise<{
     title: string;
     description: string;
-    image: string;
 }> => {
-    const response = await fetch(`https://meta.msar.me/?url=${url}`);
+    try {
+        const response = await fetch(
+            `/api/metadata?url=${encodeURIComponent(url)}`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                cache: "force-cache",
+                next: { revalidate: 3600 }, // 1 hour
+            },
+        );
 
-    if (!response.ok) {
-        throw new Error(`Error fetching link metadata: ${response.statusText}`);
+        if (!response.ok) {
+            throw new Error(
+                `Error fetching link metadata: ${response.statusText}`,
+            );
+        }
+
+        const data = await response.json();
+        return {
+            title: data.title || "",
+            description: data.description || "",
+        };
+    } catch (error) {
+        return { title: "", description: "" };
     }
-
-    return response.json();
 };
