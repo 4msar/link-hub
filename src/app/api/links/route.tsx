@@ -1,8 +1,9 @@
 import { getLinks } from "@/lib/api";
+import { VERY_LONG_CACHE_DURATION } from "@/lib/constant";
 import { type NextRequest } from "next/server";
 
-// Cache this route for 60 seconds
-export const revalidate = 60;
+// Cache duration for this route
+export const revalidate = VERY_LONG_CACHE_DURATION;
 
 export async function GET(request: NextRequest) {
     try {
@@ -18,7 +19,10 @@ export async function GET(request: NextRequest) {
 
         return new Response(JSON.stringify(links), {
             status: 200,
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "Cache-Control": `public, max-age=${VERY_LONG_CACHE_DURATION}`,
+            },
         });
     } catch (error) {
         return new Response(

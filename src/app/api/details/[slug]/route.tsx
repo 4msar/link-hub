@@ -1,7 +1,8 @@
 import { getLinkBySlug } from "@/lib/api";
+import { VERY_LONG_CACHE_DURATION } from "@/lib/constant";
 
-// Cache this route for 60 seconds
-export const revalidate = 60;
+// Cache duration for this route
+export const revalidate = VERY_LONG_CACHE_DURATION;
 
 export async function GET(
     request: Request,
@@ -12,7 +13,13 @@ export async function GET(
 
         const link = await getLinkBySlug(slug);
 
-        return Response.json(link);
+        return new Response(JSON.stringify(link), {
+            status: 200,
+            headers: {
+                "Content-Type": "application/json",
+                "Cache-Control": `public, max-age=${VERY_LONG_CACHE_DURATION}`,
+            },
+        });
     } catch (error) {
         return new Response(error.message ?? "Something went wrong", {
             status: 500,

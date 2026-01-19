@@ -1,7 +1,8 @@
 import { getComments } from "@/lib/api";
+import { MEDIUM_CACHE_DURATION } from "@/lib/constant";
 
-// Cache this route for 30 seconds
-export const revalidate = 30;
+// Cache duration for this route
+export const revalidate = MEDIUM_CACHE_DURATION;
 
 export async function GET(
     request: Request,
@@ -12,7 +13,13 @@ export async function GET(
 
         const link = await getComments(id);
 
-        return Response.json(link);
+        return new Response(JSON.stringify(link), {
+            status: 200,
+            headers: {
+                "Content-Type": "application/json",
+                "Cache-Control": `public, max-age=${MEDIUM_CACHE_DURATION}`,
+            },
+        });
     } catch (error) {
         return new Response(error.message ?? "Something went wrong", {
             status: 500,

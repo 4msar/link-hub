@@ -1,26 +1,20 @@
 import { revalidatePath } from "next/cache";
 import { type NextRequest } from "next/server";
 
-export async function POST(request: NextRequest) {
+type RevalidateType = "page" | "layout" | undefined;
+
+export async function GET(request: NextRequest) {
     try {
-        const body = await request.json();
-        const { path, type } = body;
+        const path = request.nextUrl.searchParams.get("path");
+        const type = (request.nextUrl.searchParams.get("type") ||
+            undefined) as RevalidateType;
 
         if (!path) {
             return new Response(
-                JSON.stringify({ error: "Missing path parameter" }),
-                {
-                    status: 400,
-                    headers: { "Content-Type": "application/json" },
-                }
-            );
-        }
-
-        // Validate type parameter if provided
-        if (type && type !== "page" && type !== "layout") {
-            return new Response(
                 JSON.stringify({
-                    error: "Invalid type parameter. Must be 'page' or 'layout'",
+                    revalidated: false,
+                    now: Date.now(),
+                    message: "Missing path parameter",
                 }),
                 {
                     status: 400,
@@ -46,7 +40,9 @@ export async function POST(request: NextRequest) {
     } catch (error) {
         return new Response(
             JSON.stringify({
-                error:
+                revalidated: false,
+                now: Date.now(),
+                message:
                     error instanceof Error
                         ? error.message
                         : "Internal server error",
