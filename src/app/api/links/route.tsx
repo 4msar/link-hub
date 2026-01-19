@@ -3,7 +3,7 @@ import { VERY_LONG_CACHE_DURATION } from "@/lib/constant";
 import { type NextRequest } from "next/server";
 
 // Cache duration for this route
-export const revalidate = VERY_LONG_CACHE_DURATION;
+export const revalidate = 86400;
 
 export async function GET(request: NextRequest) {
     try {
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
             Array.from(searchParams.entries()).map(([key, value]) => [
                 key,
                 value,
-            ])
+            ]),
         );
 
         const links = await getLinks(queryParams);
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
             {
                 status: 500,
                 headers: { "Content-Type": "application/json" },
-            }
+            },
         );
     }
 }

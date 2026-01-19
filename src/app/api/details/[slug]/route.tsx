@@ -2,11 +2,11 @@ import { getLinkBySlug } from "@/lib/api";
 import { VERY_LONG_CACHE_DURATION } from "@/lib/constant";
 
 // Cache duration for this route
-export const revalidate = VERY_LONG_CACHE_DURATION;
+export const revalidate = 86400;
 
 export async function GET(
     request: Request,
-    { params }: RouteContext<"/api/details/[slug]">
+    { params }: RouteContext<"/api/details/[slug]">,
 ) {
     try {
         const { slug } = await params;

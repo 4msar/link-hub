@@ -2,11 +2,11 @@ import { getComments } from "@/lib/api";
 import { MEDIUM_CACHE_DURATION } from "@/lib/constant";
 
 // Cache duration for this route
-export const revalidate = MEDIUM_CACHE_DURATION;
+export const revalidate = 300;
 
 export async function GET(
     request: Request,
-    { params }: RouteContext<"/api/comments/[id]">
+    { params }: RouteContext<"/api/comments/[id]">,
 ) {
     try {
         const { id } = await params;
