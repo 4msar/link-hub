@@ -32,21 +32,12 @@ The following GET routes are cached with automatic revalidation:
 
 You can manually revalidate cached paths using the revalidation endpoint:
 
-### `POST /api/revalidate`
+### `GET /api/revalidate`
 
-**Request Body:**
+**Query Parameters:**
 
-```json
-// query parameters
-{
-    "path": "/api/links",
-    "type": "page"
-}
-```
-
-**Parameters:**
-
-- `path` (required): The path to revalidate (e.g., "/api/links", "/slug-name")
+- `path` (required): The path to revalidate (e.g., "/", "/slug-name")
+- `tag` (optional): The cache tag to revalidate (e.g., "links", "comments")
 - `type` (optional): Either "page" or "layout" (defaults to "page")
 
 **Success Response (200):**
@@ -54,7 +45,7 @@ You can manually revalidate cached paths using the revalidation endpoint:
 ```json
 {
     "revalidated": true,
-    "path": "/api/links",
+    "path": "/",
     "now": 1234567890
 }
 ```
@@ -63,19 +54,28 @@ You can manually revalidate cached paths using the revalidation endpoint:
 
 ```json
 {
-    "error": "Missing path parameter"
+    "revalidated": false,
+    "now": 1234567890,
+    "message": "Missing path parameter"
 }
 ```
 
 **Example Usage:**
 
 ```bash
-# Revalidate the links API cache
-curl -X GET https://pockets.msar.me/api/revalidate?path=/api/links
+# Revalidate the home page and links cache
+curl -X GET https://pockets.msar.me/api/revalidate?path=/&tag=links
 
 # Revalidate a specific link detail page
-curl -X GET https://pockets.msar.me/api/revalidate?path=/some-slug-name&tag=/some-slug-name
+curl -X GET https://pockets.msar.me/api/revalidate?path=/some-slug-name
 ```
+
+## Cache Tags
+
+The following cache tags are used across the application:
+
+- `links`: Applied to all links data fetching (getLinks, getLinkBySlug)
+- Use these tags with the revalidate endpoint to invalidate specific caches
 
 ## How Caching Works
 

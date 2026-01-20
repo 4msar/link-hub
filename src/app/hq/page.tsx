@@ -88,6 +88,27 @@ export default function AdminPage() {
         toast.success("Logged out");
     };
 
+    const handleCacheRevalidation = async () => {
+        try {
+            const queryParams = new URLSearchParams({
+                path: "/",
+                tag: "links",
+            });
+
+            const response = await fetch(
+                `/api/revalidate?${queryParams.toString()}`,
+            );
+
+            if (response.ok) {
+                toast.success("Cache revalidated successfully");
+            } else {
+                toast.error("Failed to revalidate cache");
+            }
+        } catch (error) {
+            toast.error("An error occurred during revalidation");
+        }
+    };
+
     // Show loading while checking stored PIN
     if (isVerifying && !isAuthenticated) {
         return (
@@ -153,6 +174,16 @@ export default function AdminPage() {
                         <AddLinkForm pin={pin} />
                     </CardContent>
                 </Card>
+
+                <div className="mt-8 flex items-center justify-center">
+                    <Button
+                        variant="destructive"
+                        className="cursor-pointer text-white"
+                        onClick={handleCacheRevalidation}
+                    >
+                        Revalidate Cache
+                    </Button>
+                </div>
             </div>
         </div>
     );

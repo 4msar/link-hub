@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createLink } from "@/lib/api";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 export async function POST(request: NextRequest) {
     try {
@@ -33,12 +34,8 @@ export async function POST(request: NextRequest) {
         const result = await createLink({ name, slug, value, type });
 
         // Revalidate the links cache
-        await fetch(`${request.nextUrl.origin}/api/revalidate`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
+        revalidatePath("/api/links");
+        revalidateTag("links", "max");
 
         return NextResponse.json(
             { success: true, data: result },

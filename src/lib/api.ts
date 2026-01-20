@@ -26,7 +26,7 @@ export const getLinks = async (
             },
             next: {
                 revalidate: 3600, // 1 hour
-                tags: ["/api/links"],
+                tags: ["links"],
             },
         } as RequestInit,
     );
@@ -41,9 +41,18 @@ export const getLinks = async (
 
 export const getLinkBySlug = async (
     slug: string,
+    params?: Record<string, string | number>,
 ): Promise<LinkDetailsResponse> => {
+    const queryParams = params
+        ? new URLSearchParams(
+              Object.entries(params)
+                  .filter(([_, value]) => value)
+                  .map(([key, value]) => [key, value.toString()]),
+          ).toString()
+        : "";
+
     const response = await fetch(
-        `${BASE_API_URL}/values/${projectID}/${slug}`,
+        `${BASE_API_URL}/values/${projectID}/${slug}${queryParams ? `?${queryParams}` : ""}`,
         {
             method: "GET",
             headers: {
@@ -52,7 +61,7 @@ export const getLinkBySlug = async (
             },
             cache: "force-cache",
             next: {
-                tags: ["/api/links"],
+                tags: ["links"],
                 revalidate: 3600, // 1 hour
             },
         } as RequestInit,
@@ -68,7 +77,7 @@ export const getLinkBySlug = async (
 
 export const getComments = async (id: string): Promise<LinksResponse> => {
     const response = await fetch(
-        `${BASE_API_URL}/values/${commentsProjectID}?type=comment:${id}`,
+        `${BASE_API_URL}/values/${commentsProjectID}?type=comment:${id}&include_timestamps=true&per_page=50`,
         {
             method: "GET",
             headers: {

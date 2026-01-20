@@ -4,6 +4,8 @@ export interface LinkItem {
     slug: string;
     value: string;
     type: "text" | "url" | "link";
+    created_at?: string;
+    updated_at?: string;
 }
 
 export interface LinksResponse {
@@ -31,6 +33,8 @@ export interface ProjectDetails {
     slug: string;
     description?: string;
     status: string;
+    created_at?: string;
+    updated_at?: string;
 }
 
 export interface LinkDetailsResponse {

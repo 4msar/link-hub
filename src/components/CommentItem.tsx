@@ -16,9 +16,22 @@ export const CommentItem = ({ comment }: CommentItemProps) => {
                     {comment.value}
                 </p>
                 {comment.name && (
-                    <p className="text-xs text-muted-foreground mt-1">
-                        — {comment.name}
-                    </p>
+                    <div className="mt-2 flex justify-between items-center">
+                        <p className="text-xs text-muted-foreground">
+                            — {comment.name}
+                        </p>
+                        {comment.created_at && (
+                            <p className="text-xs text-muted-foreground">
+                                {new Date(
+                                    comment.created_at,
+                                ).toLocaleDateString(undefined, {
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                })}
+                            </p>
+                        )}
+                    </div>
                 )}
             </div>
         </div>

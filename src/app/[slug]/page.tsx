@@ -14,7 +14,7 @@ export default async function Page({
 }) {
     try {
         const { slug } = await params;
-        const data = await getLinkBySlug(slug);
+        const data = await getLinkBySlug(slug, { include_timestamps: "true" });
 
         if (!data?.data) {
             notFound();
@@ -53,9 +53,22 @@ export default async function Page({
                                     <h1 className="text-2xl font-bold text-foreground mb-2">
                                         {link.name}
                                     </h1>
-                                    <Badge variant="secondary" className="mb-3">
-                                        {link.type}
-                                    </Badge>
+                                    <div className="flex items-center gap-4 flex-wrap mb-3">
+                                        <Badge variant="secondary">
+                                            {link.type}
+                                        </Badge>
+
+                                        <p className="text-sm text-muted-foreground">
+                                            Created on{" "}
+                                            {new Date(
+                                                link.created_at,
+                                            ).toLocaleDateString(undefined, {
+                                                year: "numeric",
+                                                month: "long",
+                                                day: "numeric",
+                                            })}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </CardHeader>
