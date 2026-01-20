@@ -48,7 +48,7 @@ const LinksList = () => {
             ([entry]) => {
                 if (
                     entry.isIntersecting &&
-                    response?.next_page_url &&
+                    response?.links.next &&
                     !isLoading
                 ) {
                     setCurrentPage((prev) => prev + 1);
@@ -66,7 +66,7 @@ const LinksList = () => {
                 observer.unobserve(observerTarget.current);
             }
         };
-    }, [response?.next_page_url, isLoading]);
+    }, [response?.links.next, isLoading]);
 
     return (
         <div className="space-y-6">

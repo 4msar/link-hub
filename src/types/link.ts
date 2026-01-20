@@ -8,14 +8,21 @@ export interface LinkItem {
 
 export interface LinksResponse {
     data: LinkItem[];
-    current_page: number;
-    first_page_url: string;
-    from: number;
-    next_page_url: string | null;
-    path: string;
-    per_page: number;
-    prev_page_url: string | null;
-    to: number;
+    links: {
+        first: string | null;
+        last: string | null;
+        prev: string | null;
+        next: string | null;
+    };
+    meta: {
+        current_page: number;
+        from: number | null;
+        last_page: number;
+        per_page: number;
+        to: number | null;
+        total?: number;
+        path?: string;
+    };
 }
 
 export interface ProjectDetails {
