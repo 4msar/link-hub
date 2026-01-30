@@ -1,6 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-}
+    reactStrictMode: true,
+    redirects: () => {
+        return [
+            {
+                source: "/rss.xml",
+                destination: "/feed",
+                permanent: true,
+            },
+        ];
+    },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
