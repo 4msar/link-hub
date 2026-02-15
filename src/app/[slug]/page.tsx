@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { ExternalLink, ArrowLeft, FileText, Link2 } from "lucide-react";
 import { TransitionLink } from "@/components/TransitionLink";
 import { notFound } from "next/navigation";
+import { addRefToLink } from "@/lib/utils";
+import { RefLink } from "@/components/RefLink";
 
 export default async function Page({
     params,
@@ -79,15 +81,9 @@ export default async function Page({
                                         {isUrl ? "URL" : "Content"}
                                     </p>
                                     {isUrl ? (
-                                        <a
-                                            href={link.value}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex items-center gap-2 text-primary hover:underline break-all"
-                                        >
+                                        <RefLink href={link.value} className="flex items-center gap-2 text-primary hover:underline break-all">
                                             {link.value}
-                                            <ExternalLink className="w-4 h-4 shrink-0" />
-                                        </a>
+                                        </RefLink>
                                     ) : (
                                         <p className="text-foreground wrap-break-word whitespace-pre-wrap">
                                             {link.value}
@@ -101,14 +97,10 @@ export default async function Page({
                                             asChild
                                             className="w-full gap-2"
                                         >
-                                            <a
-                                                href={link.value}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                            >
+                                            <RefLink href={link.value}>
                                                 Visit Link
                                                 <ExternalLink className="w-4 h-4" />
-                                            </a>
+                                            </RefLink>
                                         </Button>
                                     </div>
                                 )}

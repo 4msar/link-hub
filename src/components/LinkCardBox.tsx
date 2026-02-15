@@ -2,6 +2,8 @@ import { MessageSquare, ArrowUpRight, ExternalLink } from "lucide-react";
 import { LinkItem } from "@/types/link";
 import { TransitionLink } from "./TransitionLink";
 import { TooltipTitle } from "./tooltip";
+import { addRefToLink } from "@/lib/utils";
+import { RefLink } from "./RefLink";
 
 interface LinkCardProps {
     link: LinkItem;
@@ -14,10 +16,7 @@ export const LinkCardBox = ({ link }: LinkCardProps) => {
         <div className="group relative">
             <div className="relative flex flex-col h-full rounded-2xl border border-border bg-card hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 overflow-hidden">
                 {/* Main Content Area */}
-                <a
-                    href={link.value}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                <RefLink href={link.value}
                     className="flex-1 p-6 flex flex-col gap-4"
                 >
                     {/* Icon/Visual Element */}
@@ -34,7 +33,7 @@ export const LinkCardBox = ({ link }: LinkCardProps) => {
                             {link.value}
                         </p>
                     </div>
-                </a>
+                </RefLink>
 
                 {/* Footer with Actions */}
                 <div className="border-t border-border bg-muted/30 px-4 py-3 flex items-center justify-between gap-2">
@@ -54,17 +53,14 @@ export const LinkCardBox = ({ link }: LinkCardProps) => {
 
                     {isUrl && (
                         <TooltipTitle title="Open link">
-                            <a
-                                href={link.value}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                            <RefLink href={link.value}
                                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-secondary border border-transparent hover:border-neutral-900/20 transition-colors text-sm"
                             >
                                 <span className="text-muted-foreground">
                                     Visit
                                 </span>
                                 <ArrowUpRight className="w-4 h-4" />
-                            </a>
+                            </RefLink>
                         </TooltipTitle>
                     )}
                 </div>
