@@ -1,9 +1,8 @@
-import { MessageSquare, ArrowUpRight, ExternalLink } from "lucide-react";
 import { LinkItem } from "@/types/link";
+import { ArrowUpRight, MessageSquare } from "lucide-react";
+import { RefLink } from "./RefLink";
 import { TransitionLink } from "./TransitionLink";
 import { TooltipTitle } from "./tooltip";
-import { addRefToLink } from "@/lib/utils";
-import { RefLink } from "./RefLink";
 
 interface LinkCardProps {
     link: LinkItem;

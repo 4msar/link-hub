@@ -1,13 +1,12 @@
-import { getLinkBySlug } from "@/lib/api";
 import { LinkComments } from "@/components/LinkComments";
+import { RefLink } from "@/components/RefLink";
+import { TransitionLink } from "@/components/TransitionLink";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ExternalLink, ArrowLeft, FileText, Link2 } from "lucide-react";
-import { TransitionLink } from "@/components/TransitionLink";
+import { getLinkBySlug } from "@/lib/api";
+import { ArrowLeft, ExternalLink, FileText, Link2 } from "lucide-react";
 import { notFound } from "next/navigation";
-import { addRefToLink } from "@/lib/utils";
-import { RefLink } from "@/components/RefLink";
 
 export default async function Page({
     params,
