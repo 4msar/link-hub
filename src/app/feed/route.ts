@@ -1,4 +1,5 @@
 import { getLinks } from "@/lib/api";
+import { addRefToLink } from "@/lib/utils";
 import { LinkItem } from "@/types/link";
 import { NextResponse } from "next/server";
 
@@ -31,7 +32,7 @@ function generateRssItem(link: LinkItem): string {
     return `
     <item>
       <title>${escapeXml(link.name)}</title>
-      <link>${escapeXml(linkUrl)}</link>
+      <link>${escapeXml(addRefToLink(linkUrl))}</link>
       <guid isPermaLink="false">${escapeXml(String(link.id))}</guid>
       <pubDate>${pubDate}</pubDate>
       <description>${escapeXml(link.value)}</description>
