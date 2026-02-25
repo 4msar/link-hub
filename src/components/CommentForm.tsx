@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { SendHorizontal } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useCommentsMutation } from "@/hooks/use-comments-mutation";
-import { useSonner } from "sonner";
 
 interface CommentFormProps {
     linkId: string | number;
@@ -53,7 +52,7 @@ export const CommentForm = ({ linkId }: CommentFormProps) => {
                         variant: "destructive",
                     });
                 },
-            }
+            },
         );
     };
 

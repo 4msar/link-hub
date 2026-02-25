@@ -1,4 +1,5 @@
 import { postComment } from "@/lib/api";
+import { revalidatePath } from "next/cache";
 
 export async function POST(request: Request) {
     try {
@@ -11,11 +12,13 @@ export async function POST(request: Request) {
                 {
                     status: 400,
                     headers: { "Content-Type": "application/json" },
-                }
+                },
             );
         }
 
         const response = await postComment(linkId, name, comment);
+
+        revalidatePath(`/api/comments/${linkId}`, "page");
 
         return new Response(JSON.stringify(response), {
             status: 201,
@@ -32,7 +35,7 @@ export async function POST(request: Request) {
             {
                 status: 500,
                 headers: { "Content-Type": "application/json" },
-            }
+            },
         );
     }
 }

@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 export const submitComment = async (
     linkId: string | number,
     name: string,
-    comment: string
+    comment: string,
 ) => {
     try {
         const response = await fetch("/api/comments", {
