@@ -145,6 +145,7 @@ export const createLink = async (data: {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
+            "X-Project-Id": projectID,
             Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify(data),
