@@ -21,8 +21,8 @@ function escapeXml(unsafe: string): string {
 
 function generateRssItem(link: LinkItem): string {
     const linkUrl =
-        link.startsWith('http')
-            ? link.value
+        link.link.startsWith('http')
+            ? link.link
             : `${SITE_URL}/${link.slug}`;
 
     const pubDate = link.created_at
