@@ -1,6 +1,7 @@
 import { HeaderLinks } from "@/components/header-links";
 import LinksList from "@/components/LinksList";
 import { Link2 } from "lucide-react";
+import { Suspense } from "react";
 
 export default function Home() {
     return (
@@ -17,7 +18,9 @@ export default function Home() {
                     <p className="text-muted-foreground mt-1 font-medium">
                         A curated collection of everything I've saved for later.
                     </p>
-                    <HeaderLinks />
+                    <Suspense>
+                        <HeaderLinks />
+                    </Suspense>
                 </header>
 
                 {/* Links List */}
