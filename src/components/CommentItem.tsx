@@ -13,7 +13,7 @@ export const CommentItem = ({ comment }: CommentItemProps) => {
             </div>
             <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground wrap-break-word whitespace-pre-line">
-                    {comment.value}
+                    {comment.comment}
                 </p>
                 {comment.name && (
                     <div className="mt-2 flex justify-between items-center">

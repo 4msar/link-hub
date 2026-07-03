@@ -8,7 +8,7 @@ interface LinkCardProps {
 }
 
 export const LinkCardBar = ({ link }: LinkCardProps) => {
-    const isUrl = link.type === "url" || link.type === "link";
+    const isUrl = link.link.startsWith("http");
 
     return (
         <div className="group relative">
@@ -17,16 +17,16 @@ export const LinkCardBar = ({ link }: LinkCardProps) => {
                 <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                         <a
-                            href={link.value}
+                            href={link.link}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex-1 min-w-0 pt-1"
                         >
                             <h3 className="font-semibold text-base text-foreground truncate group-hover:text-primary transition-colors">
-                                {link.name}
+                                {link.title}
                             </h3>
                             <p className="text-sm text-muted-foreground/80 truncate mt-0.5">
-                                {link.value}
+                                {link.link}
                             </p>
                         </a>
                     </div>
@@ -45,7 +45,7 @@ export const LinkCardBar = ({ link }: LinkCardProps) => {
                         {isUrl && (
                             <TooltipTitle title="Open link">
                                 <a
-                                    href={link.value}
+                                    href={link.link}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="p-2 rounded-lg hover:bg-secondary transition-colors bg-card border border-border"
