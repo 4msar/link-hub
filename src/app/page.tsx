@@ -1,3 +1,4 @@
+import { HeaderLinks } from "@/components/header-links";
 import LinksList from "@/components/LinksList";
 import { Link2 } from "lucide-react";
 
@@ -14,8 +15,9 @@ export default function Home() {
                         Things I Saved!
                     </h1>
                     <p className="text-muted-foreground mt-1 font-medium">
-                        Interesting finds, useful resources, and ideas worth saving, revisiting, and exploring another day.
+                        A curated collection of everything I've saved for later.
                     </p>
+                    <HeaderLinks />
                 </header>
 
                 {/* Links List */}
@@ -26,14 +28,16 @@ export default function Home() {
                 {/* Footer */}
                 <footer className="text-center mt-12">
                     <p className="text-xs text-muted-foreground/60 flex items-center justify-center gap-2">
-                        Developed by{" "}
-                        <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href="https://msar.me"
-                        >
-                            Saiful Alam
-                        </a>
+                        <span>
+                            Curated by{" "}
+                            <a
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                href="https://msar.me"
+                            >
+                                Saiful Alam
+                            </a>
+                        </span>
                         <span>|</span>
                         <a
                             target="_blank"
