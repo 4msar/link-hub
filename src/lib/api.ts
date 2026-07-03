@@ -5,7 +5,7 @@
  * This modules should only use in backend/server-side code.
  */
 import { LinkDetailsResponse, LinksResponse } from "@/types/link";
-import { apiKey, BASE_API_URL, commentsProjectID, projectID } from "./constant";
+import { apiKey, BASE_API_URL, projectID } from "./constant";
 
 export const getLinks = async (
     params: Record<string, string | number>,
@@ -16,12 +16,15 @@ export const getLinks = async (
             .map(([key, value]) => [key, value.toString()]),
     ).toString();
 
+    console.log({url: `${BASE_API_URL}/values/${projectID}?${queryParams}`})
+
     const response = await fetch(
         `${BASE_API_URL}/values/${projectID}?${queryParams}`,
         {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                "X-Project-Id": projectID,
                 Authorization: `Bearer ${apiKey}`,
             },
             next: {
@@ -57,6 +60,7 @@ export const getLinkBySlug = async (
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                "X-Project-Id": projectID,
                 Authorization: `Bearer ${apiKey}`,
             },
             cache: "force-cache",
@@ -67,21 +71,24 @@ export const getLinkBySlug = async (
         } as RequestInit,
     );
 
+    
     if (!response.ok) {
         throw new Error(`Error fetching link by slug: ${response.statusText}`);
     }
-
+    
     const data: LinkDetailsResponse = await response.json();
+    console.log({data})
     return data;
 };
 
-export const getComments = async (id: string): Promise<LinksResponse> => {
+export const getComments = async (slug: string): Promise<LinksResponse> => {
     const response = await fetch(
-        `${BASE_API_URL}/values/${commentsProjectID}?type=comment:${id}&include_timestamps=true&per_page=50`,
+        `${BASE_API_URL}/comments/${projectID}/${slug}?per_page=50`,
         {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                "X-Project-Id": projectID,
                 Authorization: `Bearer ${apiKey}`,
             },
             cache: "no-store",
@@ -97,23 +104,26 @@ export const getComments = async (id: string): Promise<LinksResponse> => {
 };
 
 export const postComment = async (
-    linkId: string | number,
+    slug: string,
     name: string,
     comment: string,
 ): Promise<unknown> => {
+    if(!comment) {
+        throw new Error("Comment cannot be empty");
+    }
+
     const response = await fetch(
-        `${BASE_API_URL}/values/${commentsProjectID}`,
+        `${BASE_API_URL}/comments/${projectID}/${slug}`,
         {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "X-Project-Id": projectID,
                 Authorization: `Bearer ${apiKey}`,
             },
             body: JSON.stringify({
                 name: name || "Anonymous",
-                value: comment,
-                slug: `comment-${Date.now()}`,
-                type: `comment:${linkId}`,
+                comment: comment || "",
             }),
         },
     );

@@ -8,13 +8,13 @@ import { Skeleton } from "./ui/skeleton";
 import { useComments } from "@/hooks/use-comments";
 
 interface CommentsListProps {
-    linkId: string | number;
+    linkSlug: string;
     refreshTrigger?: number;
 }
 
-export const CommentsList = ({ linkId }: CommentsListProps) => {
+export const CommentsList = ({ linkSlug }: CommentsListProps) => {
     const [comments, setComments] = useState<Comment[]>([]);
-    const { data, isLoading, error } = useComments(linkId);
+    const { data, isLoading, error } = useComments(linkSlug);
 
     useEffect(() => {
         if (data) {
@@ -46,7 +46,7 @@ export const CommentsList = ({ linkId }: CommentsListProps) => {
         );
     }
 
-    if (comments.length === 0) {
+    if (Number(comments?.length||0) === 0) {
         return (
             <div className="text-center py-12">
                 <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mx-auto mb-3">

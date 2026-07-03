@@ -1,9 +1,11 @@
+import { CommentItem, PaginatedItems } from "@/types/link";
 import { useQuery } from "@tanstack/react-query";
-import { LinksResponse } from "@/types/link";
+
+type CommentsResponse = PaginatedItems<CommentItem>
 
 export const fetchComments = async (
     id: string | number,
-): Promise<LinksResponse> => {
+): Promise<CommentsResponse> => {
     const response = await fetch(`/api/comments/${id}`, {
         method: "GET",
         next: { revalidate: 300 }, // Revalidate every 5 minutes
@@ -11,7 +13,7 @@ export const fetchComments = async (
     if (!response.ok) {
         throw new Error("Failed to fetch comments");
     }
-    const data: LinksResponse = await response.json();
+    const data: CommentsResponse = await response.json();
     return data;
 };
 

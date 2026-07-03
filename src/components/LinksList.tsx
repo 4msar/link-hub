@@ -98,7 +98,7 @@ const LinksList = () => {
             {allLinks.length > 0 && (
                 <div className="space-y-3">
                     {allLinks.map((link, index) => (
-                        <LinkCard key={`${link.name}-${index}`} link={link} />
+                        <LinkCard key={`${link.title}-${index}`} link={link} />
                     ))}
                 </div>
             )}

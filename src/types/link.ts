@@ -1,15 +1,15 @@
 export interface LinkItem {
     id: string | number;
-    name: string;
+    title: string;
     slug: string;
-    value: string;
-    type: "text" | "url" | "link";
+    link: string;
     created_at?: string;
-    updated_at?: string;
 }
 
-export interface LinksResponse {
-    data: LinkItem[];
+export type LinksResponse = PaginatedItems<LinkItem>
+
+export type PaginatedItems<T> = {
+    data: T[];
     links: {
         first: string | null;
         last: string | null;
@@ -22,8 +22,8 @@ export interface LinksResponse {
         last_page: number;
         per_page: number;
         to: number | null;
-        total?: number;
-        path?: string;
+        total: number;
+        path: string;
     };
 }
 
@@ -38,10 +38,15 @@ export interface ProjectDetails {
 }
 
 export interface LinkDetailsResponse {
-    data: LinkItem;
+    item: LinkItem;
     project: ProjectDetails;
 }
 
-export interface Comment extends Omit<LinkItem, "type"> {
-    type: string;
+export type Comment = CommentItem
+
+export interface CommentItem {
+    id: string | number;
+    name: string;
+    comment: string;
+    created_at: string;
 }

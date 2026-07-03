@@ -17,12 +17,12 @@ export default async function Page({
         const { slug } = await params;
         const data = await getLinkBySlug(slug, { include_timestamps: "true" });
 
-        if (!data?.data) {
+        if (!data?.item) {
             notFound();
         }
 
-        const link = data.data;
-        const isUrl = link.type === "url" || link.type === "link";
+        const link = data.item;
+        const isUrl = link.link.startsWith("http");
 
         return (
             <div className="min-h-screen bg-background">
@@ -52,11 +52,11 @@ export default async function Page({
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <h1 className="text-2xl font-bold text-foreground mb-2">
-                                        {link.name}
+                                        {link.title}
                                     </h1>
                                     <div className="flex items-center gap-4 flex-wrap mb-3">
                                         <Badge variant="secondary">
-                                            {link.type}
+                                            {link.link.startsWith("http") ? "URL" : "Content"}
                                         </Badge>
 
                                         <p className="text-sm text-muted-foreground">
@@ -80,12 +80,12 @@ export default async function Page({
                                         {isUrl ? "URL" : "Content"}
                                     </p>
                                     {isUrl ? (
-                                        <RefLink href={link.value} className="flex items-center gap-2 text-primary hover:underline break-all">
-                                            {link.value}
+                                        <RefLink href={link.link} className="flex items-center gap-2 text-primary hover:underline break-all">
+                                            {link.link}
                                         </RefLink>
                                     ) : (
                                         <p className="text-foreground wrap-break-word whitespace-pre-wrap">
-                                            {link.value}
+                                            {link.link}
                                         </p>
                                     )}
                                 </div>
@@ -96,7 +96,7 @@ export default async function Page({
                                             asChild
                                             className="w-full gap-2"
                                         >
-                                            <RefLink href={link.value}>
+                                            <RefLink href={link.link}>
                                                 Visit Link
                                                 <ExternalLink className="w-4 h-4" />
                                             </RefLink>
@@ -108,7 +108,7 @@ export default async function Page({
                     </Card>
 
                     {/* Comments Section */}
-                    <LinkComments linkId={link.id} />
+                    <LinkComments linkSlug={link.slug} />
                 </div>
             </div>
         );

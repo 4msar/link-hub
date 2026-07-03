@@ -7,10 +7,10 @@ import { Separator } from "./ui/separator";
 import { MessageCircle } from "lucide-react";
 
 interface LinkCommentsProps {
-    linkId: string | number;
+    linkSlug: string;
 }
 
-export const LinkComments = ({ linkId }: LinkCommentsProps) => {
+export const LinkComments = ({ linkSlug }: LinkCommentsProps) => {
     return (
         <div className="space-y-6">
             {/* Comment Form */}
@@ -22,7 +22,7 @@ export const LinkComments = ({ linkId }: LinkCommentsProps) => {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <CommentForm linkId={linkId} />
+                    <CommentForm linkSlug={linkSlug} />
                 </CardContent>
             </Card>
 
@@ -30,7 +30,7 @@ export const LinkComments = ({ linkId }: LinkCommentsProps) => {
             <div>
                 <h3 className="text-lg font-semibold mb-4">Comments</h3>
                 <Separator className="mb-6" />
-                <CommentsList linkId={linkId} />
+                <CommentsList linkSlug={linkSlug} />
             </div>
         </div>
     );

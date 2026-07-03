@@ -10,10 +10,10 @@ import { useToast } from "@/hooks/use-toast";
 import { useCommentsMutation } from "@/hooks/use-comments-mutation";
 
 interface CommentFormProps {
-    linkId: string | number;
+    linkSlug: string;
 }
 
-export const CommentForm = ({ linkId }: CommentFormProps) => {
+export const CommentForm = ({ linkSlug }: CommentFormProps) => {
     const { mutate, isPending: isSubmitting } = useCommentsMutation();
     const [name, setName] = useState("");
     const [comment, setComment] = useState("");
@@ -32,7 +32,7 @@ export const CommentForm = ({ linkId }: CommentFormProps) => {
         }
 
         mutate(
-            { linkId, name: name.trim(), comment: comment.trim() },
+            { linkSlug, name: name.trim(), comment: comment.trim() },
             {
                 onSuccess: () => {
                     setComment("");

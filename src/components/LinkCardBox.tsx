@@ -9,13 +9,13 @@ interface LinkCardProps {
 }
 
 export const LinkCardBox = ({ link }: LinkCardProps) => {
-    const isUrl = link.type === "url" || link.type === "link";
+    const isUrl = link.link.startsWith("http");
 
     return (
         <div className="group relative">
             <div className="relative flex flex-col h-full rounded-2xl border border-border bg-card hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 overflow-hidden">
                 {/* Main Content Area */}
-                <RefLink href={link.value}
+                <RefLink href={link.link}
                     className="flex-1 p-6 flex flex-col gap-4"
                 >
                     {/* Icon/Visual Element */}
@@ -26,10 +26,10 @@ export const LinkCardBox = ({ link }: LinkCardProps) => {
                     {/* Title and URL */}
                     <div className="flex-1">
                         <h3 className="font-bold text-lg text-foreground mb-2 group-hover:text-gray-800 transition-all line-clamp-2">
-                            {link.name}
+                            {link.title}
                         </h3>
                         <p className="text-sm font-semibold text-muted-foreground/80 line-clamp-2 break-all">
-                            {link.value}
+                            {link.link}
                         </p>
                     </div>
                 </RefLink>
@@ -52,7 +52,7 @@ export const LinkCardBox = ({ link }: LinkCardProps) => {
 
                     {isUrl && (
                         <TooltipTitle title="Open link">
-                            <RefLink href={link.value}
+                            <RefLink href={link.link}
                                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-secondary border border-transparent hover:border-neutral-900/20 transition-colors text-sm"
                             >
                                 <span className="text-muted-foreground">

@@ -4,9 +4,9 @@ import { revalidatePath } from "next/cache";
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { linkId, name, comment } = body;
+        const { linkSlug, name, comment } = body;
 
-        if (!comment || !linkId) {
+        if (!comment || !linkSlug) {
             return new Response(
                 JSON.stringify({ error: "Missing required fields" }),
                 {
@@ -16,9 +16,9 @@ export async function POST(request: Request) {
             );
         }
 
-        const response = await postComment(linkId, name, comment);
+        const response = await postComment(linkSlug, name, comment);
 
-        revalidatePath(`/api/comments/${linkId}`, "page");
+        revalidatePath(`/api/comments/${linkSlug}`, "page");
 
         return new Response(JSON.stringify(response), {
             status: 201,

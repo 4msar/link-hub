@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const submitComment = async (
-    linkId: string | number,
+    linkSlug: string,
     name: string,
     comment: string,
 ) => {
@@ -12,7 +12,7 @@ export const submitComment = async (
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                linkId,
+                linkSlug,
                 name: name.trim() || "Anonymous",
                 comment: comment.trim(),
             }),
@@ -31,14 +31,14 @@ export const useCommentsMutation = () => {
 
     return useMutation({
         mutationFn: ({
-            linkId,
+            linkSlug,
             name,
             comment,
         }: {
-            linkId: string | number;
+            linkSlug: string;
             name: string;
             comment: string;
-        }) => submitComment(linkId, name, comment),
+        }) => submitComment(linkSlug, name, comment),
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ["comments"],

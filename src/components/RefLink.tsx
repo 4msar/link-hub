@@ -1,5 +1,7 @@
 "use client";
+
 import { addRefToLink, cn } from "@/lib/utils";
+import { useSyncExternalStore } from "react";
 
 export const RefLink = ({
   href,
@@ -10,9 +12,15 @@ export const RefLink = ({
   children: React.ReactNode;
   className?: string;
 }) => {
+  const resolvedHref = useSyncExternalStore(
+    () => () => {},
+    () => addRefToLink(href),
+    () => href,
+  );
+
   return (
     <a
-      href={addRefToLink(href)}
+      href={resolvedHref}
       target="_blank"
       rel="noopener noreferrer"
       className={cn(className)}
