@@ -31,7 +31,7 @@ function generateRssItem(link: LinkItem): string {
 
     return `
     <item>
-      <title>${escapeXml(link.name)}</title>
+      <title>${escapeXml(link.title)}</title>
       <link>${escapeXml(addRefToLink(linkUrl))}</link>
       <guid isPermaLink="false">${escapeXml(String(link.id))}</guid>
       <pubDate>${pubDate}</pubDate>
