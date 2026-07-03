@@ -21,7 +21,7 @@ function escapeXml(unsafe: string): string {
 
 function generateRssItem(link: LinkItem): string {
     const linkUrl =
-        link.type === "url" || link.type === "link"
+        link.startsWith('http')
             ? link.value
             : `${SITE_URL}/${link.slug}`;
 
