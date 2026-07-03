@@ -11,10 +11,10 @@ export default function Home() {
                         <Link2 className="w-8 h-8 text-primary-foreground" />
                     </div>
                     <h1 className="text-2xl font-bold text-foreground">
-                        My Bookmarked Links
+                        Things I Saved!
                     </h1>
                     <p className="text-muted-foreground mt-1 font-medium">
-                        All of my bookmarked links in one place.
+                        Interesting finds, useful resources, and ideas worth saving, revisiting, and exploring another day.
                     </p>
                 </header>
 
