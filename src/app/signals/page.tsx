@@ -8,7 +8,19 @@ type SignalsPageProps = {
 };
 
 export default async function SignalsPage({ searchParams }: SignalsPageProps) {
-    const [files, params] = await Promise.all([getSignalFiles(), searchParams]);
+    let files: Awaited<ReturnType<typeof getSignalFiles>>;
+    let params: Awaited<typeof searchParams>;
+
+    try {
+        [files, params] = await Promise.all([getSignalFiles(), searchParams]);
+    } catch {
+        return (
+            <main className="flex h-screen items-center justify-center bg-background px-6 text-center text-foreground">
+                <p role="alert">Unable to load this signal artifact.</p>
+            </main>
+        );
+    }
+
     const selectedFile =
         files.find((file) => file.name === params.file) ?? files[0];
 
