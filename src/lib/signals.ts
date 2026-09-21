@@ -29,18 +29,29 @@ const normalizeMetadataValue = (value: string): string | undefined => {
     return normalized.length > 0 ? normalized : undefined;
 };
 
-const getMetaAttributeValue = (tag: string, attribute: string): string | undefined => {
-    const quotedMatch = tag.match(
-        new RegExp(`${attribute}\\s*=\\s*(['"])(.*?)\\1`, "i"),
-    );
+const ATTRIBUTE_QUOTED_PATTERNS = {
+    name: /name\s*=\s*(['"])(.*?)\1/i,
+    property: /property\s*=\s*(['"])(.*?)\1/i,
+    content: /content\s*=\s*(['"])(.*?)\1/i,
+} as const;
+
+const ATTRIBUTE_UNQUOTED_PATTERNS = {
+    name: /name\s*=\s*([^\s"'=<>`]+)/i,
+    property: /property\s*=\s*([^\s"'=<>`]+)/i,
+    content: /content\s*=\s*([^\s"'=<>`]+)/i,
+} as const;
+
+const getMetaAttributeValue = (
+    tag: string,
+    attribute: keyof typeof ATTRIBUTE_QUOTED_PATTERNS,
+): string | undefined => {
+    const quotedMatch = tag.match(ATTRIBUTE_QUOTED_PATTERNS[attribute]);
 
     if (quotedMatch?.[2]) {
         return quotedMatch[2];
     }
 
-    const unquotedMatch = tag.match(
-        new RegExp(`${attribute}\\s*=\\s*([^\\s"'=<>\\x60]+)`, "i"),
-    );
+    const unquotedMatch = tag.match(ATTRIBUTE_UNQUOTED_PATTERNS[attribute]);
     return unquotedMatch?.[1];
 };
 
