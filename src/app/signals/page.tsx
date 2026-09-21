@@ -1,11 +1,70 @@
 import { SignalFileMenu } from "@/components/SignalFileMenu";
-import { getSignalFiles, getSignalUrl } from "@/lib/signals";
+import {
+    getLatestSignalMetadata,
+    getSignalFiles,
+    getSignalUrl,
+} from "@/lib/signals";
+import type { Metadata } from "next";
 
 export const revalidate = 86400;
+
+const fallbackSignalsMetadata: Metadata = {
+    title: "Signals",
+    description: "View the latest signal artifact files.",
+    openGraph: {
+        title: "Signals",
+        description: "View the latest signal artifact files.",
+        type: "website",
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "Signals",
+        description: "View the latest signal artifact files.",
+    },
+};
 
 type SignalsPageProps = {
     searchParams: Promise<{ file?: string }>;
 };
+
+export async function generateMetadata(): Promise<Metadata> {
+    try {
+        const latestMetadata = await getLatestSignalMetadata();
+
+        const title =
+            latestMetadata.title ??
+            latestMetadata.openGraphTitle ??
+            fallbackSignalsMetadata.title;
+        const description =
+            latestMetadata.description ??
+            latestMetadata.openGraphDescription ??
+            fallbackSignalsMetadata.description;
+
+        return {
+            ...fallbackSignalsMetadata,
+            title,
+            description,
+            openGraph: {
+                ...fallbackSignalsMetadata.openGraph,
+                title: latestMetadata.openGraphTitle ?? title,
+                description: latestMetadata.openGraphDescription ?? description,
+            },
+            twitter: {
+                ...fallbackSignalsMetadata.twitter,
+                title:
+                    latestMetadata.twitterTitle ??
+                    latestMetadata.openGraphTitle ??
+                    title,
+                description:
+                    latestMetadata.twitterDescription ??
+                    latestMetadata.openGraphDescription ??
+                    description,
+            },
+        };
+    } catch {
+        return fallbackSignalsMetadata;
+    }
+}
 
 export default async function SignalsPage({ searchParams }: SignalsPageProps) {
     let files: Awaited<ReturnType<typeof getSignalFiles>>;
