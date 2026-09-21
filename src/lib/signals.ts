@@ -77,15 +77,6 @@ const extractMetaContent = (
     return undefined;
 };
 
-const extractTitle = (html: string): string | undefined => {
-    const match = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
-    if (!match?.[1]) {
-        return undefined;
-    }
-
-    return normalizeMetadataValue(match[1].replace(/<[^>]*>/g, ""));
-};
-
 const parseSignalFile = (value: unknown): SignalFile | null => {
     if (!isRecord(value)) {
         return null;
@@ -162,21 +153,26 @@ export const getLatestSignalMetadata = async (): Promise<LatestSignalMetadata> =
     }
 
     const html = await response.text();
+    const openGraphTitle = extractMetaContent(html, "property", "og:title");
+    const twitterTitle = extractMetaContent(html, "name", "twitter:title");
+    const openGraphDescription = extractMetaContent(
+        html,
+        "property",
+        "og:description",
+    );
+    const twitterDescription = extractMetaContent(
+        html,
+        "name",
+        "twitter:description",
+    );
+    const description = extractMetaContent(html, "name", "description");
 
     return {
-        title: extractTitle(html),
-        description: extractMetaContent(html, "name", "description"),
-        openGraphTitle: extractMetaContent(html, "property", "og:title"),
-        openGraphDescription: extractMetaContent(
-            html,
-            "property",
-            "og:description",
-        ),
-        twitterTitle: extractMetaContent(html, "name", "twitter:title"),
-        twitterDescription: extractMetaContent(
-            html,
-            "name",
-            "twitter:description",
-        ),
+        title: openGraphTitle ?? twitterTitle,
+        description,
+        openGraphTitle,
+        openGraphDescription,
+        twitterTitle,
+        twitterDescription,
     };
 };
