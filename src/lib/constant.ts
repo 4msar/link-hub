@@ -3,3 +3,4 @@ export const BASE_API_URL =
 export const apiKey = process.env.API_KEY || "";
 export const projectID = process.env.PROJECT_ID || "pockets";
 export const ADMIN_PIN = process.env.ADMIN_PIN || "";
+export const SIGNAL_ARTIFACT_ID = process.env.SIGNAL_ARTIFACT_ID || "";
