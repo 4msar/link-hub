@@ -1,6 +1,15 @@
-const ARTIFACT_ID = "01M0YHXS3AZRN9DSRQMFS52QPE";
-const ARTIFACT_API_URL = `https://artifacts.msar.dev/api/artifact/${ARTIFACT_ID}`;
-const ARTIFACT_BASE_URL = `https://artifacts.msar.dev/a/${ARTIFACT_ID}`;
+import { SIGNAL_ARTIFACT_ID } from "@/lib/constant";
+
+const ARTIFACT_API_URL = `https://artifacts.msar.dev/api/artifact/${SIGNAL_ARTIFACT_ID}`;
+const ARTIFACT_BASE_URL = `https://artifacts.msar.dev/a/${SIGNAL_ARTIFACT_ID}`;
+
+const getSignalArtifactId = (): string => {
+    if (!SIGNAL_ARTIFACT_ID) {
+        throw new Error("Missing SIGNAL_ARTIFACT_ID");
+    }
+
+    return SIGNAL_ARTIFACT_ID;
+};
 
 export type SignalFile = {
     name: string;
@@ -97,10 +106,13 @@ const parseSignalFile = (value: unknown): SignalFile | null => {
     return { name, uploaded };
 };
 
-const parseArtifactResponse = (value: unknown): ParsedArtifactResponse => {
+const parseArtifactResponse = (
+    value: unknown,
+    artifactId: string,
+): ParsedArtifactResponse => {
     if (
         !isRecord(value) ||
-        value.id !== ARTIFACT_ID ||
+        value.id !== artifactId ||
         !Array.isArray(value.files)
     ) {
         throw new Error("Invalid artifact response");
@@ -118,10 +130,12 @@ const parseArtifactResponse = (value: unknown): ParsedArtifactResponse => {
         throw new Error("No inbox signals found");
     }
 
-    return { id: ARTIFACT_ID, files };
+    return { id: artifactId, files };
 };
 
 export const getSignalFiles = async (): Promise<SignalFile[]> => {
+    const artifactId = getSignalArtifactId();
+
     const response = await fetch(ARTIFACT_API_URL, {
         next: { revalidate: 86400 },
     });
@@ -130,12 +144,14 @@ export const getSignalFiles = async (): Promise<SignalFile[]> => {
         throw new Error(`Failed to fetch signals: ${response.status}`);
     }
 
-    const artifact = parseArtifactResponse(await response.json());
+    const artifact = parseArtifactResponse(await response.json(), artifactId);
     return artifact.files;
 };
 
-export const getSignalUrl = (name: string): string =>
-    `${ARTIFACT_BASE_URL}/${encodeURIComponent(name)}`;
+export const getSignalUrl = (name: string): string => {
+    getSignalArtifactId();
+    return `${ARTIFACT_BASE_URL}/${encodeURIComponent(name)}`;
+};
 
 export const getLatestSignalMetadata = async (): Promise<LatestSignalMetadata> => {
     const [latestFile] = await getSignalFiles();
