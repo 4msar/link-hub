@@ -29,7 +29,7 @@ export function SignalFileMenu({ files, selectedFile }: SignalFileMenuProps) {
             <DropdownMenuTrigger asChild>
                 <button
                     type="button"
-                    className="inline-flex max-w-[calc(100vw-2rem)] items-center gap-2 truncate rounded-md px-2 py-1 text-sm font-medium text-foreground outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
+                    className="inline-flex max-w-[calc(100vw-2rem)] items-center gap-2 truncate rounded-md px-2 py-1 text-sm font-medium text-foreground outline-none transition-colors hover:bg-muted"
                     aria-label="Choose an inbox signal"
                 >
                     <span className="truncate">{selectedFile}</span>

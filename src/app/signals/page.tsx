@@ -94,14 +94,12 @@ export default async function SignalsPage({ searchParams }: SignalsPageProps) {
 
     return (
         <main className="flex h-screen flex-col overflow-hidden bg-background">
-            <header className="flex h-8 shrink-0 items-center justify-center border-b border-border bg-background px-4">
-                <div className="flex items-center gap-4">
-                    <SignalFileMenu
-                        files={files}
-                        selectedFile={selectedFile.name}
-                    />
-                    <PageInfo />
-                </div>
+            <header className="flex h-8 shrink-0 items-center justify-between border-b border-border bg-background px-4">
+                <SignalFileMenu
+                    files={files}
+                    selectedFile={selectedFile.name}
+                />
+                <PageInfo />
             </header>
             <iframe
                 title={selectedFile.name}
