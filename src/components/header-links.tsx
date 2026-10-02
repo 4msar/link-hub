@@ -6,7 +6,7 @@ import { Badge } from "./ui/badge";
 const navItems = [
     { label: "msar.me", href: "https://msar.me" },
     { label: "blog", href: "https://blog.msar.me" },
-    { label: "github", href: "https://github.com/4msar" },
+    { label: "signals", href: "/signals" },
 ];
 
 export const HeaderLinks = () => {
