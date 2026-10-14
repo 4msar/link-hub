@@ -162,21 +162,28 @@ export const getSignalFiles = async (): Promise<SignalFile[]> => {
     return files;
 };
 
-export const getLatestSignalFeed = async (): Promise<string> => {
-    const feeds = (await getArtifactFiles(SIGNAL_FEED_DIRECTORY))
+export type SignalFeedFile = {
+    fileName: string;
+    date: string;
+};
+
+export const getSignalFeedFiles = async (): Promise<SignalFeedFile[]> =>
+    (await getArtifactFiles(SIGNAL_FEED_DIRECTORY))
         .map((file) => file.name.match(SIGNAL_FEED_FILE_PATTERN))
         .filter((match): match is RegExpMatchArray => match !== null)
         .map(([fileName, date]) => ({ fileName, date }))
         .sort((left, right) => right.date.localeCompare(left.date));
 
-    const [latestFeed] = feeds;
+export const isSignalFeedFileName = (fileName: string): boolean =>
+    SIGNAL_FEED_FILE_PATTERN.test(fileName);
 
-    if (!latestFeed) {
-        throw new Error("No signal feed found");
+export const getSignalFeed = async (fileName: string): Promise<string> => {
+    if (!isSignalFeedFileName(fileName)) {
+        throw new Error(`Invalid signal feed file name: ${fileName}`);
     }
 
     const response = await fetch(
-        `${ARTIFACT_BASE_URL}/${SIGNAL_FEED_DIRECTORY}/${encodeURIComponent(latestFeed.fileName)}`,
+        `${ARTIFACT_BASE_URL}/${SIGNAL_FEED_DIRECTORY}/${encodeURIComponent(fileName)}`,
         { next: { revalidate: 86400 } },
     );
 
@@ -185,6 +192,16 @@ export const getLatestSignalFeed = async (): Promise<string> => {
     }
 
     return response.text();
+};
+
+export const getLatestSignalFeed = async (): Promise<string> => {
+    const [latestFeed] = await getSignalFeedFiles();
+
+    if (!latestFeed) {
+        throw new Error("No signal feed found");
+    }
+
+    return getSignalFeed(latestFeed.fileName);
 };
 
 export const getSignalUrl = (name: string): string => {
