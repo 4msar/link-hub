@@ -12,7 +12,7 @@ import {
     getSignalFiles,
     getSignalUrl,
 } from "@/lib/signals";
-import { Info } from "lucide-react";
+import { ExternalLink, Info } from "lucide-react";
 import type { Metadata } from "next";
 
 export const revalidate = 86400;
@@ -102,7 +102,19 @@ export default async function SignalsPage({ searchParams }: SignalsPageProps) {
                     files={files}
                     selectedFile={selectedFile.name}
                 />
-                <PageInfo />
+                <div className="flex items-center gap-1">
+                    <a
+                        href={`/signals/file/${encodeURIComponent(selectedFile.name)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex size-6 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                        aria-label={`Open ${selectedFile.name} in a new tab`}
+                        title="Open in new tab"
+                    >
+                        <ExternalLink className="size-4" />
+                    </a>
+                    <PageInfo />
+                </div>
             </header>
             <iframe
                 title={selectedFile.name}
