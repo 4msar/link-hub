@@ -81,10 +81,13 @@ export default async function SignalsPage({ searchParams }: SignalsPageProps) {
 
     try {
         [files, params] = await Promise.all([getSignalFiles(), searchParams]);
-    } catch {
+    } catch (error) {
         return (
-            <main className="flex h-screen items-center justify-center bg-background px-6 text-center text-foreground">
+            <main className="flex h-screen flex-col items-center justify-center bg-background px-6 text-center text-foreground">
                 <p role="alert">Unable to load this signal artifact.</p>
+                <code className="mt-2 block text-sm text-muted-foreground">
+                    {error instanceof Error ? error.message : String(error)}
+                </code>
             </main>
         );
     }

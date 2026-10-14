@@ -86,7 +86,11 @@ const extractMetaContent = (
     return undefined;
 };
 
-const parseSignalFile = (value: unknown): SignalFile | null => {
+const SIGNAL_FILE_PATTERN = /^Inbox-Signal-.+\.html$/i;
+const SIGNAL_FEED_DIRECTORY = "feed";
+const SIGNAL_FEED_FILE_PATTERN = /^rss-(\d{4}-\d{2}-\d{2})\.xml$/i;
+
+const parseArtifactFile = (value: unknown): SignalFile | null => {
     if (!isRecord(value)) {
         return null;
     }
@@ -96,7 +100,6 @@ const parseSignalFile = (value: unknown): SignalFile | null => {
 
     if (
         typeof name !== "string" ||
-        !/^Inbox-Signal-.+\.html$/i.test(name) ||
         typeof uploaded !== "string" ||
         Number.isNaN(Date.parse(uploaded))
     ) {
@@ -119,24 +122,23 @@ const parseArtifactResponse = (
     }
 
     const files = value.files
-        .map(parseSignalFile)
+        .map(parseArtifactFile)
         .filter((file): file is SignalFile => file !== null)
         .sort(
             (left, right) =>
                 Date.parse(right.uploaded) - Date.parse(left.uploaded),
         );
 
-    if (files.length === 0) {
-        throw new Error("No inbox signals found");
-    }
-
     return { id: artifactId, files };
 };
 
-export const getSignalFiles = async (): Promise<SignalFile[]> => {
+const getArtifactFiles = async (path?: string): Promise<SignalFile[]> => {
     const artifactId = getSignalArtifactId();
+    const url = path
+        ? `${ARTIFACT_API_URL}?path=${encodeURIComponent(path)}`
+        : ARTIFACT_API_URL;
 
-    const response = await fetch(ARTIFACT_API_URL, {
+    const response = await fetch(url, {
         next: { revalidate: 86400 },
     });
 
@@ -148,47 +150,92 @@ export const getSignalFiles = async (): Promise<SignalFile[]> => {
     return artifact.files;
 };
 
+export const getSignalFiles = async (): Promise<SignalFile[]> => {
+    const files = (await getArtifactFiles()).filter((file) =>
+        SIGNAL_FILE_PATTERN.test(file.name),
+    );
+
+    if (files.length === 0) {
+        throw new Error("No inbox signals found");
+    }
+
+    return files;
+};
+
+export const getLatestSignalFeed = async (): Promise<string> => {
+    const feeds = (await getArtifactFiles(SIGNAL_FEED_DIRECTORY))
+        .map((file) => file.name.match(SIGNAL_FEED_FILE_PATTERN))
+        .filter((match): match is RegExpMatchArray => match !== null)
+        .map(([fileName, date]) => ({ fileName, date }))
+        .sort((left, right) => right.date.localeCompare(left.date));
+
+    console.log(
+        "Fetched feeds:",
+        feeds.map((feed) => feed.fileName),
+    );
+
+    const [latestFeed] = feeds;
+
+    if (!latestFeed) {
+        throw new Error("No signal feed found");
+    }
+
+    const response = await fetch(
+        `${ARTIFACT_BASE_URL}/${SIGNAL_FEED_DIRECTORY}/${encodeURIComponent(latestFeed.fileName)}`,
+        { next: { revalidate: 86400 } },
+    );
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch signal feed: ${response.status}`);
+    }
+
+    return response.text();
+};
+
 export const getSignalUrl = (name: string): string => {
     getSignalArtifactId();
     return `${ARTIFACT_BASE_URL}/${encodeURIComponent(name)}`;
 };
 
-export const getLatestSignalMetadata = async (): Promise<LatestSignalMetadata> => {
-    const [latestFile] = await getSignalFiles();
+export const getLatestSignalMetadata =
+    async (): Promise<LatestSignalMetadata> => {
+        const [latestFile] = await getSignalFiles();
 
-    if (!latestFile) {
-        throw new Error("No latest signal file found");
-    }
+        if (!latestFile) {
+            throw new Error("No latest signal file found");
+        }
 
-    const response = await fetch(getSignalUrl(latestFile.name), {
-        next: { revalidate: 86400 },
-    });
+        const response = await fetch(getSignalUrl(latestFile.name), {
+            next: { revalidate: 86400 },
+        });
 
-    if (!response.ok) {
-        throw new Error(`Failed to fetch latest signal file: ${response.status}`);
-    }
+        if (!response.ok) {
+            throw new Error(
+                `Failed to fetch latest signal file: ${response.status}`,
+            );
+        }
 
-    const html = await response.text();
-    const openGraphTitle = extractMetaContent(html, "property", "og:title");
-    const twitterTitle = extractMetaContent(html, "name", "twitter:title");
-    const openGraphDescription = extractMetaContent(
-        html,
-        "property",
-        "og:description",
-    );
-    const twitterDescription = extractMetaContent(
-        html,
-        "name",
-        "twitter:description",
-    );
-    const description = extractMetaContent(html, "name", "description");
+        const html = await response.text();
+        const openGraphTitle = extractMetaContent(html, "property", "og:title");
+        const twitterTitle = extractMetaContent(html, "name", "twitter:title");
+        const openGraphDescription = extractMetaContent(
+            html,
+            "property",
+            "og:description",
+        );
+        const twitterDescription = extractMetaContent(
+            html,
+            "name",
+            "twitter:description",
+        );
+        const description = extractMetaContent(html, "name", "description");
 
-    return {
-        title: openGraphTitle ?? twitterTitle,
-        description,
-        openGraphTitle,
-        openGraphDescription,
-        twitterTitle,
-        twitterDescription,
+        return {
+            title: openGraphTitle ?? twitterTitle,
+            description,
+            openGraphTitle,
+            openGraphDescription,
+            twitterTitle,
+            twitterDescription,
+        };
     };
-};
