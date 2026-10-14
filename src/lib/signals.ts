@@ -1,20 +1,6 @@
-import { SIGNAL_ARTIFACT_ID } from "@/lib/constant";
+import { getSignalProvider, type SignalFile } from "@/lib/signal-providers";
 
-const ARTIFACT_API_URL = `https://artifacts.msar.dev/api/artifact/${SIGNAL_ARTIFACT_ID}`;
-const ARTIFACT_BASE_URL = `https://artifacts.msar.dev/a/${SIGNAL_ARTIFACT_ID}`;
-
-const getSignalArtifactId = (): string => {
-    if (!SIGNAL_ARTIFACT_ID) {
-        throw new Error("Missing SIGNAL_ARTIFACT_ID");
-    }
-
-    return SIGNAL_ARTIFACT_ID;
-};
-
-export type SignalFile = {
-    name: string;
-    uploaded: string;
-};
+export type { SignalFile };
 
 export type LatestSignalMetadata = {
     title?: string;
@@ -24,14 +10,6 @@ export type LatestSignalMetadata = {
     twitterTitle?: string;
     twitterDescription?: string;
 };
-
-type ParsedArtifactResponse = {
-    id: string;
-    files: SignalFile[];
-};
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-    typeof value === "object" && value !== null;
 
 const normalizeMetadataValue = (value: string): string | undefined => {
     const normalized = value.replace(/\s+/g, " ").trim();
@@ -90,68 +68,8 @@ const SIGNAL_FILE_PATTERN = /^Inbox-Signal-.+\.html$/i;
 const SIGNAL_FEED_DIRECTORY = "feed";
 const SIGNAL_FEED_FILE_PATTERN = /^rss-(\d{4}-\d{2}-\d{2})\.xml$/i;
 
-const parseArtifactFile = (value: unknown): SignalFile | null => {
-    if (!isRecord(value)) {
-        return null;
-    }
-
-    const name = value.name;
-    const uploaded = value.uploaded;
-
-    if (
-        typeof name !== "string" ||
-        typeof uploaded !== "string" ||
-        Number.isNaN(Date.parse(uploaded))
-    ) {
-        return null;
-    }
-
-    return { name, uploaded };
-};
-
-const parseArtifactResponse = (
-    value: unknown,
-    artifactId: string,
-): ParsedArtifactResponse => {
-    if (
-        !isRecord(value) ||
-        value.id !== artifactId ||
-        !Array.isArray(value.files)
-    ) {
-        throw new Error("Invalid artifact response");
-    }
-
-    const files = value.files
-        .map(parseArtifactFile)
-        .filter((file): file is SignalFile => file !== null)
-        .sort(
-            (left, right) =>
-                Date.parse(right.uploaded) - Date.parse(left.uploaded),
-        );
-
-    return { id: artifactId, files };
-};
-
-const getArtifactFiles = async (path?: string): Promise<SignalFile[]> => {
-    const artifactId = getSignalArtifactId();
-    const url = path
-        ? `${ARTIFACT_API_URL}?path=${encodeURIComponent(path)}`
-        : ARTIFACT_API_URL;
-
-    const response = await fetch(url, {
-        next: { revalidate: 86400 },
-    });
-
-    if (!response.ok) {
-        throw new Error(`Failed to fetch signals: ${response.status}`);
-    }
-
-    const artifact = parseArtifactResponse(await response.json(), artifactId);
-    return artifact.files;
-};
-
 export const getSignalFiles = async (): Promise<SignalFile[]> => {
-    const files = (await getArtifactFiles()).filter((file) =>
+    const files = (await getSignalProvider().listFiles()).filter((file) =>
         SIGNAL_FILE_PATTERN.test(file.name),
     );
 
@@ -168,7 +86,7 @@ export type SignalFeedFile = {
 };
 
 export const getSignalFeedFiles = async (): Promise<SignalFeedFile[]> =>
-    (await getArtifactFiles(SIGNAL_FEED_DIRECTORY))
+    (await getSignalProvider().listFiles(SIGNAL_FEED_DIRECTORY))
         .map((file) => file.name.match(SIGNAL_FEED_FILE_PATTERN))
         .filter((match): match is RegExpMatchArray => match !== null)
         .map(([fileName, date]) => ({ fileName, date }))
@@ -182,16 +100,7 @@ export const getSignalFeed = async (fileName: string): Promise<string> => {
         throw new Error(`Invalid signal feed file name: ${fileName}`);
     }
 
-    const response = await fetch(
-        `${ARTIFACT_BASE_URL}/${SIGNAL_FEED_DIRECTORY}/${encodeURIComponent(fileName)}`,
-        { next: { revalidate: 86400 } },
-    );
-
-    if (!response.ok) {
-        throw new Error(`Failed to fetch signal feed: ${response.status}`);
-    }
-
-    return response.text();
+    return getSignalProvider().getFile(`${SIGNAL_FEED_DIRECTORY}/${fileName}`);
 };
 
 export const getLatestSignalFeed = async (): Promise<string> => {
@@ -204,25 +113,15 @@ export const getLatestSignalFeed = async (): Promise<string> => {
     return getSignalFeed(latestFeed.fileName);
 };
 
-export const getSignalUrl = (name: string): string => {
-    getSignalArtifactId();
-    return `${ARTIFACT_BASE_URL}/${encodeURIComponent(name)}`;
-};
+export const getSignalUrl = (name: string): string =>
+    getSignalProvider().getPublicUrl(name);
 
 export const getSignal = async (name: string): Promise<string> => {
     if (!SIGNAL_FILE_PATTERN.test(name)) {
         throw new Error(`Invalid signal file name: ${name}`);
     }
 
-    const response = await fetch(getSignalUrl(name), {
-        next: { revalidate: 86400 },
-    });
-
-    if (!response.ok) {
-        throw new Error(`Failed to fetch signal file: ${response.status}`);
-    }
-
-    return response.text();
+    return getSignalProvider().getFile(name);
 };
 
 export const getLatestSignalMetadata =
@@ -233,17 +132,7 @@ export const getLatestSignalMetadata =
             throw new Error("No latest signal file found");
         }
 
-        const response = await fetch(getSignalUrl(latestFile.name), {
-            next: { revalidate: 86400 },
-        });
-
-        if (!response.ok) {
-            throw new Error(
-                `Failed to fetch latest signal file: ${response.status}`,
-            );
-        }
-
-        const html = await response.text();
+        const html = await getSignal(latestFile.name);
         const openGraphTitle = extractMetaContent(html, "property", "og:title");
         const twitterTitle = extractMetaContent(html, "name", "twitter:title");
         const openGraphDescription = extractMetaContent(
