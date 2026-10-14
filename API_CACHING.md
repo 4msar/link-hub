@@ -36,9 +36,10 @@ You can manually revalidate cached paths using the revalidation endpoint:
 
 **Query Parameters:**
 
-- `path` (required): The path to revalidate (e.g., "/", "/slug-name")
+- `path` (required unless `all=true`): The path to revalidate (e.g., "/", "/slug-name")
 - `tag` (optional): The cache tag to revalidate (e.g., "links", "comments")
 - `type` (optional): Either "page" or "layout" (defaults to "page")
+- `all` (optional): `true` clears every cache in the app: all cache tags (`links`, `signals`) expire immediately and every route is revalidated. The **Clear All Cache** button in `/hq` uses this.
 
 **Success Response (200):**
 
@@ -66,15 +67,23 @@ You can manually revalidate cached paths using the revalidation endpoint:
 # Revalidate the home page and links cache
 curl -X GET https://pockets.msar.me/api/revalidate?path=/&tag=links
 
+# Clear all caches
+curl -X GET "https://pockets.msar.me/api/revalidate?all=true"
+
 # Revalidate a specific link detail page
 curl -X GET https://pockets.msar.me/api/revalidate?path=/some-slug-name
 ```
+
+## Signals Provider Cache
+
+Signal provider results (file listings and file contents from GitHub or artifacts) are cached for 1 day with the Next.js 16 `"use cache"` directive (`cacheLife` + `cacheTag`) under the `signals` tag, so the GitHub API rate limit (60 requests/hour unauthenticated) is not hit by regular traffic. Failed requests are not cached.
 
 ## Cache Tags
 
 The following cache tags are used across the application:
 
 - `links`: Applied to all links data fetching (getLinks, getLinkBySlug)
+- `signals`: Applied to all signal provider data (listings, signal files, RSS feeds)
 - Use these tags with the revalidate endpoint to invalidate specific caches
 
 ## How Caching Works

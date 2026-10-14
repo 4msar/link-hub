@@ -1,4 +1,6 @@
-import { SIGNAL_ARTIFACT_ID } from "@/lib/constant";
+import {
+    SIGNAL_ARTIFACT_ID,
+} from "@/lib/constant";
 import {
     encodePath,
     isRecord,
@@ -66,7 +68,6 @@ export const artifactsProvider: SignalProvider = {
             : ARTIFACT_API_URL;
 
         const response = await fetch(url, {
-            next: { revalidate: 86400 },
         });
 
         if (!response.ok) {
@@ -80,7 +81,6 @@ export const artifactsProvider: SignalProvider = {
         getSignalArtifactId();
 
         const response = await fetch(`${ARTIFACT_BASE_URL}/${encodePath(path)}`, {
-            next: { revalidate: 86400 },
         });
 
         if (!response.ok) {

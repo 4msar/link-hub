@@ -32,7 +32,6 @@ const githubHeaders = (): HeadersInit => ({
 const githubFetch = async (url: string): Promise<unknown> => {
     const response = await fetch(url, {
         headers: githubHeaders(),
-        next: { revalidate: 86400 },
     });
 
     if (!response.ok) {
@@ -110,7 +109,6 @@ export const githubProvider: SignalProvider = {
             headers: GITHUB_TOKEN
                 ? { Authorization: `Bearer ${GITHUB_TOKEN}` }
                 : undefined,
-            next: { revalidate: 86400 },
         });
 
         if (!response.ok) {

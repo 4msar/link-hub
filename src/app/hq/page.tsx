@@ -88,24 +88,17 @@ export default function AdminPage() {
         toast.success("Logged out");
     };
 
-    const handleCacheRevalidation = async () => {
+    const handleClearCache = async () => {
         try {
-            const queryParams = new URLSearchParams({
-                path: "/",
-                tag: "links",
-            });
-
-            const response = await fetch(
-                `/api/revalidate?${queryParams.toString()}`,
-            );
+            const response = await fetch("/api/revalidate?all=true");
 
             if (response.ok) {
-                toast.success("Cache revalidated successfully");
+                toast.success("All cache cleared");
             } else {
-                toast.error("Failed to revalidate cache");
+                toast.error("Failed to clear cache");
             }
         } catch (error) {
-            toast.error("An error occurred during revalidation");
+            toast.error("An error occurred while clearing cache");
         }
     };
 
@@ -179,9 +172,9 @@ export default function AdminPage() {
                     <Button
                         variant="destructive"
                         className="cursor-pointer text-white"
-                        onClick={handleCacheRevalidation}
+                        onClick={handleClearCache}
                     >
-                        Revalidate Cache
+                        Clear All Cache
                     </Button>
                 </div>
             </div>
