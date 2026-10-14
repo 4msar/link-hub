@@ -31,9 +31,17 @@ const getAllLinks = async (): Promise<LinkItem[]> => {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const staticRoutes: MetadataRoute.Sitemap = [
         { url: SITE_URL, changeFrequency: "daily", priority: 1 },
-        { url: `${SITE_URL}/signals`, changeFrequency: "weekly", priority: 0.8 },
+        {
+            url: `${SITE_URL}/signals`,
+            changeFrequency: "weekly",
+            priority: 0.8,
+        },
         { url: `${SITE_URL}/feed`, changeFrequency: "daily", priority: 0.5 },
-        { url: `${SITE_URL}/signals/feed`, changeFrequency: "weekly", priority: 0.5 },
+        {
+            url: `${SITE_URL}/signals/feed`,
+            changeFrequency: "weekly",
+            priority: 0.5,
+        },
     ];
 
     const [links, signalFiles] = await Promise.all([
@@ -55,11 +63,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
 
     const signalRoutes: MetadataRoute.Sitemap = signalFiles.map((file) => ({
-        url: `${SITE_URL}/signals?file=${encodeURIComponent(file.name)}`,
+        url: `${SITE_URL}/signals/file/${encodeURIComponent(file.name)}`,
         lastModified: new Date(file.uploaded),
         changeFrequency: "yearly" as const,
         priority: 0.6,
     }));
 
-    return [...staticRoutes, ...linkRoutes, ...signalRoutes];
+    return [...staticRoutes, ...signalRoutes, ...linkRoutes];
 }
