@@ -31,8 +31,18 @@ import { AddLinkForm } from "@/components/AddLinkForm";
 const ADMIN_PIN_KEY = "admin_pin";
 
 const QUICK_LINKS = [
-    { label: "Home", description: "View the public link hub", href: "/", icon: Home },
-    { label: "Signals", description: "Browse signal files", href: "/signals", icon: Radio },
+    {
+        label: "Home",
+        description: "View the public link hub",
+        href: "/",
+        icon: Home,
+    },
+    {
+        label: "Signals",
+        description: "Browse signal files",
+        href: "/signals",
+        icon: Radio,
+    },
 ];
 
 export default function AdminPage() {
@@ -229,10 +239,17 @@ export default function AdminPage() {
                             </h2>
                             <ul className="p-2 pt-0">
                                 {QUICK_LINKS.map(
-                                    ({ label, description, href, icon: Icon }) => (
+                                    ({
+                                        label,
+                                        description,
+                                        href,
+                                        icon: Icon,
+                                    }) => (
                                         <li key={href}>
-                                            <TransitionLink
+                                            <a
                                                 href={href}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
                                                 className="group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-muted"
                                             >
                                                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border bg-background">
@@ -247,7 +264,7 @@ export default function AdminPage() {
                                                     </span>
                                                 </span>
                                                 <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                                            </TransitionLink>
+                                            </a>
                                         </li>
                                     ),
                                 )}
@@ -281,14 +298,15 @@ export default function AdminPage() {
                                             Clear all cache?
                                         </AlertDialogTitle>
                                         <AlertDialogDescription>
-                                            All cached data will be
-                                            invalidated. The next visitors may
-                                            see slower load times while it is
-                                            rebuilt.
+                                            All cached data will be invalidated.
+                                            The next visitors may see slower
+                                            load times while it is rebuilt.
                                         </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogCancel>
+                                            Cancel
+                                        </AlertDialogCancel>
                                         <AlertDialogAction
                                             onClick={handleClearCache}
                                             className="bg-destructive text-white hover:bg-destructive/90"
