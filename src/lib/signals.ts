@@ -209,6 +209,22 @@ export const getSignalUrl = (name: string): string => {
     return `${ARTIFACT_BASE_URL}/${encodeURIComponent(name)}`;
 };
 
+export const getSignal = async (name: string): Promise<string> => {
+    if (!SIGNAL_FILE_PATTERN.test(name)) {
+        throw new Error(`Invalid signal file name: ${name}`);
+    }
+
+    const response = await fetch(getSignalUrl(name), {
+        next: { revalidate: 86400 },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch signal file: ${response.status}`);
+    }
+
+    return response.text();
+};
+
 export const getLatestSignalMetadata =
     async (): Promise<LatestSignalMetadata> => {
         const [latestFile] = await getSignalFiles();
