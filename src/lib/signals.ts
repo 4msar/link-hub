@@ -169,11 +169,6 @@ export const getLatestSignalFeed = async (): Promise<string> => {
         .map(([fileName, date]) => ({ fileName, date }))
         .sort((left, right) => right.date.localeCompare(left.date));
 
-    console.log(
-        "Fetched feeds:",
-        feeds.map((feed) => feed.fileName),
-    );
-
     const [latestFeed] = feeds;
 
     if (!latestFeed) {

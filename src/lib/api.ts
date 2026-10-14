@@ -16,8 +16,6 @@ export const getLinks = async (
             .map(([key, value]) => [key, value.toString()]),
     ).toString();
 
-    console.log({url: `${BASE_API_URL}/values/${projectID}?${queryParams}`})
-
     const response = await fetch(
         `${BASE_API_URL}/values/${projectID}?${queryParams}`,
         {
@@ -71,13 +69,11 @@ export const getLinkBySlug = async (
         } as RequestInit,
     );
 
-    
     if (!response.ok) {
         throw new Error(`Error fetching link by slug: ${response.statusText}`);
     }
-    
+
     const data: LinkDetailsResponse = await response.json();
-    console.log({data})
     return data;
 };
 
@@ -108,7 +104,7 @@ export const postComment = async (
     name: string,
     comment: string,
 ): Promise<unknown> => {
-    if(!comment) {
+    if (!comment) {
         throw new Error("Comment cannot be empty");
     }
 

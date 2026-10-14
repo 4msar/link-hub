@@ -44,7 +44,7 @@ export const CommentForm = ({ linkSlug }: CommentFormProps) => {
                     //
                 },
                 onError: (error) => {
-                    console.log("Error posting comment:", error);
+                    console.error("Error posting comment:", error);
 
                     toast({
                         title: "Error",
