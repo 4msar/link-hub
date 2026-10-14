@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { LinksResponse } from "@/types/link";
 
 export const fetchLinks = async (
@@ -25,6 +25,22 @@ export const useLinks = (queryParams: Record<string, string | number> = {}) => {
     return useQuery({
         queryKey: ["links", queryParams],
         queryFn: () => fetchLinks(queryParams),
+        staleTime: 1000 * 60 * 5, // 5 minutes
+    });
+};
+
+export const useInfiniteLinks = (
+    queryParams: Record<string, string | number> = {},
+) => {
+    return useInfiniteQuery({
+        queryKey: ["links", "infinite", queryParams],
+        queryFn: ({ pageParam }) =>
+            fetchLinks({ ...queryParams, page: pageParam }),
+        initialPageParam: 1,
+        getNextPageParam: (lastPage) =>
+            lastPage.links.next && lastPage.meta
+                ? lastPage.meta.current_page + 1
+                : undefined,
         staleTime: 1000 * 60 * 5, // 5 minutes
     });
 };

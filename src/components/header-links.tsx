@@ -15,7 +15,7 @@ export const HeaderLinks = () => {
     const fromParam = params.get("from");
 
     return (
-        <nav className="mt-4 flex items-center justify-center gap-2">
+        <nav className="mt-4 flex flex-wrap items-center gap-2">
             {navItems.map((item) => (
                 <Badge
                     variant={fromParam === item.label ? "default" : "outline"}

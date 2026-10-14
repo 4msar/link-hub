@@ -1,22 +1,34 @@
 import { HeaderLinks } from "@/components/header-links";
 import LinksList from "@/components/LinksList";
-import { Link2 } from "lucide-react";
+import { Bookmark } from "lucide-react";
 import { Suspense } from "react";
 
 export default function Home() {
     return (
-        <div className="min-h-screen bg-background">
-            <div className="md:max-w-lg lg:max-w-2xl mx-auto px-4 py-12">
+        <div className="relative min-h-screen bg-background">
+            {/* Subtle backdrop */}
+            <div
+                aria-hidden
+                className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(ellipse_at_top,var(--color-secondary),transparent_70%)]"
+            />
+
+            <div className="relative mx-auto max-w-2xl px-4 pb-12 pt-10 md:pt-16">
                 {/* Header */}
-                <header className="text-center mb-10">
-                    <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4">
-                        <Link2 className="w-8 h-8 text-primary-foreground" />
+                <header className="mb-6">
+                    <div className="flex items-center gap-3">
+                        <div className="flex size-11 items-center justify-center rounded-2xl bg-primary shadow-sm">
+                            <Bookmark className="size-5 text-primary-foreground" />
+                        </div>
+                        <span className="text-sm font-bold tracking-wide text-muted-foreground">
+                            pockets
+                        </span>
                     </div>
-                    <h1 className="text-2xl font-bold text-foreground">
+                    <h1 className="mt-6 text-3xl font-extrabold tracking-tight text-foreground md:text-4xl">
                         Things I Saved!
                     </h1>
-                    <p className="text-muted-foreground mt-1 font-medium">
-                        A curated collection of everything I've saved for later.
+                    <p className="mt-2 max-w-lg font-medium text-muted-foreground">
+                        A curated collection of everything I&apos;ve saved for
+                        later.
                     </p>
                     <Suspense>
                         <HeaderLinks />
@@ -29,23 +41,25 @@ export default function Home() {
                 </main>
 
                 {/* Footer */}
-                <footer className="text-center mt-12">
-                    <p className="text-xs text-muted-foreground/60 flex items-center justify-center gap-2">
+                <footer className="mt-12 border-t border-border pt-6">
+                    <p className="flex items-center justify-center gap-2 text-xs text-muted-foreground/70">
                         <span>
                             Curated by{" "}
                             <a
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 href="https://msar.me"
+                                className="font-semibold hover:text-foreground"
                             >
                                 Saiful Alam
                             </a>
                         </span>
-                        <span>|</span>
+                        <span aria-hidden>·</span>
                         <a
                             target="_blank"
                             rel="noopener noreferrer"
                             href="https://github.com/4msar/link-hub"
+                            className="font-semibold hover:text-foreground"
                         >
                             Github
                         </a>
