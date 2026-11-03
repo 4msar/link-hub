@@ -1,11 +1,16 @@
 "use client";
 
 import { Infinity as InfinityIcon, ListPlus, Settings2 } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { LoadMode, useHomeSettings } from "@/hooks/useHomeSettings";
 import { cn } from "@/lib/utils";
+import { TooltipTitle } from "./tooltip";
 
 const loadModeOptions: {
     value: LoadMode;
@@ -33,13 +38,15 @@ export const HomeSettings = () => {
     return (
         <Popover>
             <PopoverTrigger asChild>
-                <button
-                    type="button"
-                    aria-label="Display settings"
-                    className="inline-flex size-9 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                    <Settings2 className="size-4" />
-                </button>
+                <TooltipTitle title="Open display settings">
+                    <button
+                        type="button"
+                        aria-label="Display settings"
+                        className="inline-flex size-9 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                        <Settings2 className="size-4" />
+                    </button>
+                </TooltipTitle>
             </PopoverTrigger>
             <PopoverContent align="end" className="w-80 rounded-xl p-0">
                 <div className="border-b border-border px-4 py-3">

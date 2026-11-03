@@ -1,7 +1,7 @@
 "use client";
 
 import { ChangeEvent, useEffect, useRef, useState } from "react";
-import { Loader2, Search, SearchX } from "lucide-react";
+import { Loader2, PlusCircle, Search, SearchX } from "lucide-react";
 import { useInfiniteLinks } from "@/hooks/useLinks";
 import { useHomeSettings } from "@/hooks/useHomeSettings";
 import LinkCard from "./LinkCard";
@@ -9,6 +9,8 @@ import { HomeSettings } from "./HomeSettings";
 import { Button } from "@/components/ui/button";
 import { Kbd } from "@/components/ui/kbd";
 import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
+import { TooltipTitle } from "./tooltip";
 
 const LinkSkeleton = () => (
     <div className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4">
@@ -101,6 +103,15 @@ const LinksList = () => {
                         </Kbd>
                     </div>
                     <HomeSettings />
+                    <TooltipTitle title="Submit new link">
+                        <Link
+                            href="/submit"
+                            aria-label="Submit new link"
+                            className="inline-flex size-9 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                            <PlusCircle className="size-4" />
+                        </Link>
+                    </TooltipTitle>
                 </div>
             </div>
 

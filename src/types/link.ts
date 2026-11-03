@@ -50,3 +50,16 @@ export interface CommentItem {
     comment: string;
     created_at: string;
 }
+
+export type SubmissionStatus = "pending" | "rejected";
+
+export interface Submission {
+    id: number;
+    title: string;
+    link: string;
+    status: SubmissionStatus;
+    created_at: string;
+    reviewed_at: string | null;
+}
+
+export type SubmissionsResponse = PaginatedItems<Submission>;

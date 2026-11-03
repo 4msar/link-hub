@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
     AlertDialog,
@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import {
     ArrowUpRight,
     Home,
+    Inbox,
     Link2,
     Loader2,
     LogOut,
@@ -27,10 +28,17 @@ import {
 import { TransitionLink } from "@/components/TransitionLink";
 import { AuthForm, AuthShell } from "@/components/AuthForm";
 import { AddLinkForm } from "@/components/AddLinkForm";
-
-const ADMIN_PIN_KEY = "admin_pin";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
+import Link from "next/link";
 
 const QUICK_LINKS = [
+    {
+        label: "Review submissions",
+        description: "Approve or reject submitted links",
+        href: "/hq/review",
+        target: "self",
+        icon: Inbox,
+    },
     {
         label: "Home",
         description: "View the public link hub",
@@ -46,75 +54,15 @@ const QUICK_LINKS = [
 ];
 
 export default function AdminPage() {
-    const [pin, setPin] = useState("");
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [isVerifying, setIsVerifying] = useState(true);
+    const {
+        pin,
+        setPin,
+        isAuthenticated,
+        isVerifying,
+        handlePinSubmit,
+        logout: handleLogout,
+    } = useAdminAuth();
     const [isClearingCache, setIsClearingCache] = useState(false);
-
-    // Verify PIN helper
-    const verifyPin = async (pinToVerify: string) => {
-        try {
-            const response = await fetch("/api/admin/verify", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ pin: pinToVerify }),
-            });
-
-            return response.ok;
-        } catch (error) {
-            return false;
-        }
-    };
-
-    // Check for stored PIN on mount
-    useEffect(() => {
-        const storedPin = localStorage.getItem(ADMIN_PIN_KEY);
-        if (storedPin) {
-            setIsVerifying(true);
-            verifyPin(storedPin).then((isValid) => {
-                if (isValid) {
-                    setPin(storedPin);
-                    setIsAuthenticated(true);
-                } else {
-                    // Clear invalid stored PIN
-                    localStorage.removeItem(ADMIN_PIN_KEY);
-                }
-                setIsVerifying(false);
-            });
-        } else {
-            setIsVerifying(false);
-        }
-    }, []);
-
-    const handlePinSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsVerifying(true);
-
-        try {
-            const isValid = await verifyPin(pin);
-
-            if (isValid) {
-                // Store PIN in localStorage
-                localStorage.setItem(ADMIN_PIN_KEY, pin);
-                setIsAuthenticated(true);
-                toast.success("Access granted!");
-            } else {
-                toast.error("Invalid PIN");
-                setPin("");
-            }
-        } catch (error) {
-            toast.error("Verification failed");
-        } finally {
-            setIsVerifying(false);
-        }
-    };
-
-    const handleLogout = () => {
-        localStorage.removeItem(ADMIN_PIN_KEY);
-        setIsAuthenticated(false);
-        setPin("");
-        toast.success("Logged out");
-    };
 
     const handleClearCache = async () => {
         setIsClearingCache(true);
@@ -243,12 +191,13 @@ export default function AdminPage() {
                                         label,
                                         description,
                                         href,
+                                        target = "_blank",
                                         icon: Icon,
                                     }) => (
                                         <li key={href}>
-                                            <a
+                                            <Link
                                                 href={href}
-                                                target="_blank"
+                                                target={target}
                                                 rel="noopener noreferrer"
                                                 className="group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-muted"
                                             >
@@ -264,7 +213,7 @@ export default function AdminPage() {
                                                     </span>
                                                 </span>
                                                 <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                                            </a>
+                                            </Link>
                                         </li>
                                     ),
                                 )}

@@ -59,3 +59,30 @@ The admin panel uses two API endpoints:
 3. Fill out the form with link details
 4. Click "Add Link"
 5. The new link will be created and the cache will be revalidated
+
+## Public Submissions
+
+Visitors can suggest links at `/submit`. Submissions land in a separate `submissions` table and only reach the main collection once you approve them.
+
+### Reviewing
+
+Visit `/hq/review` (same PIN as `/hq`).
+
+- **Pending** (default) shows submissions waiting for review.
+- **Archived** shows every submission still in the table, with a pending/rejected badge.
+- **Approve** adds the link to the main collection and removes the submission. The pencil button lets you edit the title or link first.
+- **Reject** keeps the submission with status `rejected`. The same link cannot be submitted again.
+- **Delete** removes the submission permanently.
+
+### API Endpoints
+
+- **POST `/api/submit`** (public): `{ title, link }`. Rate limited to 5 per 10 minutes per IP (per server instance); duplicates of existing items or submissions return 409.
+- **GET `/api/admin/submissions?status=pending|all&page=`**: requires the `x-admin-pin` header.
+- **POST `/api/admin/submissions/:id`**: `{ action: "approve" | "reject", title?, link? }`, requires `x-admin-pin`. Approving revalidates the links cache.
+- **DELETE `/api/admin/submissions/:id`**: requires `x-admin-pin`.
+
+These proxy to the backend's `/api/v1/submissions/:project` endpoints. Apply the backend migration first:
+
+```bash
+cd ../pockets-backend && yarn db:migrate
+```
