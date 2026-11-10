@@ -7,6 +7,7 @@ const navItems = [
     { label: "msar.me", href: "https://msar.me" },
     { label: "blog", href: "https://blog.msar.me" },
     { label: "signals", href: "/signals" },
+    { label: "rss", href: "/feed" },
 ];
 
 export const HeaderLinks = () => {

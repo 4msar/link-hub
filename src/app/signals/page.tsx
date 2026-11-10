@@ -12,8 +12,9 @@ import {
     getSignalFiles,
     getSignalUrl,
 } from "@/lib/signals";
-import { ExternalLink, Info } from "lucide-react";
+import { ExternalLink, Info, Rss } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const revalidate = 86400;
 
@@ -103,6 +104,15 @@ export default async function SignalsPage({ searchParams }: SignalsPageProps) {
                     selectedFile={selectedFile.name}
                 />
                 <div className="flex items-center gap-1">
+                    {/* Add rss feed link */}
+                    <Link
+                        href="/signals/feed"
+                        className="inline-flex size-6 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                        aria-label="RSS feed for signal artifacts"
+                        title="Signal RSS feed"
+                    >
+                        <Rss className="size-4" />
+                    </Link>
                     <a
                         href={`/signals/file/${encodeURIComponent(selectedFile.name)}`}
                         target="_blank"
