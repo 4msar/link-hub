@@ -2,10 +2,53 @@ import { HeaderLinks } from "@/components/header-links";
 import LinksList from "@/components/LinksList";
 import { Bookmark } from "lucide-react";
 import { Suspense } from "react";
+import type { Metadata } from "next";
+import {
+    SITE_AUTHOR,
+    SITE_DESCRIPTION,
+    SITE_NAME,
+    SITE_TITLE,
+    SITE_URL,
+} from "@/lib/site";
+
+export const metadata: Metadata = {
+    title: { absolute: SITE_TITLE },
+    description: SITE_DESCRIPTION,
+    alternates: {
+        canonical: "/",
+        types: {
+            "application/rss+xml": [
+                { url: "/feed", title: "Pockets — saved links" },
+                { url: "/signals/feed", title: "Pockets — Signals" },
+            ],
+        },
+    },
+};
+
+const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: SITE_NAME,
+    alternateName: SITE_TITLE,
+    url: SITE_URL,
+    description: SITE_DESCRIPTION,
+    inLanguage: "en",
+    author: {
+        "@type": "Person",
+        name: SITE_AUTHOR.name,
+        url: SITE_AUTHOR.url,
+    },
+};
 
 export default function Home() {
     return (
         <div className="relative min-h-screen bg-background">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+                }}
+            />
             {/* Subtle backdrop */}
             <div
                 aria-hidden

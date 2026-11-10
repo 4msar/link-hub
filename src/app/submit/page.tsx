@@ -2,10 +2,20 @@ import type { Metadata } from "next";
 import { Bookmark } from "lucide-react";
 import { SubmitLinkForm } from "@/components/SubmitLinkForm";
 import { TransitionLink } from "@/components/TransitionLink";
+import { SITE_NAME } from "@/lib/site";
 
 export const metadata: Metadata = {
     title: "Submit a link",
     description: "Suggest a link for the pockets collection.",
+    alternates: { canonical: "/submit" },
+    openGraph: {
+        title: "Submit a link",
+        description: "Suggest a link for the pockets collection.",
+        url: "/submit",
+        siteName: SITE_NAME,
+        locale: "en_US",
+        type: "website",
+    },
 };
 
 export default function SubmitPage() {

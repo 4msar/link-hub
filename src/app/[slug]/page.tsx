@@ -6,7 +6,53 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { getLinkBySlug } from "@/lib/api";
 import { ArrowLeft, ExternalLink, FileText, Link2 } from "lucide-react";
+import { SITE_NAME, TWITTER_HANDLE, truncate } from "@/lib/site";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+    try {
+        const { slug } = await params;
+        const data = await getLinkBySlug(slug, { include_timestamps: "true" });
+        if (!data?.item) return {};
+
+        const { title, link } = data.item;
+        const isUrl = link.startsWith("http");
+        const description = truncate(
+            isUrl ? `${title} — a link saved on Pockets: ${link}` : link,
+            160,
+        );
+        const url = `/${encodeURIComponent(slug)}`;
+
+        return {
+            title,
+            description,
+            alternates: { canonical: url },
+            openGraph: {
+                title,
+                description,
+                url,
+                siteName: SITE_NAME,
+                locale: "en_US",
+                type: "article",
+                publishedTime: data.item.created_at,
+            },
+            twitter: {
+                card: "summary_large_image",
+                site: TWITTER_HANDLE,
+                creator: TWITTER_HANDLE,
+                title,
+                description,
+            },
+        };
+    } catch {
+        return {};
+    }
+}
 
 export default async function Page({
     params,

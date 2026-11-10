@@ -147,8 +147,13 @@ export const getLatestSignalMetadata =
         );
         const description = extractMetaContent(html, "name", "description");
 
+        // Signal files usually carry only a <title>, so fall back to it.
+        const documentTitle = normalizeMetadataValue(
+            html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1] ?? "",
+        );
+
         return {
-            title: openGraphTitle ?? twitterTitle,
+            title: openGraphTitle ?? twitterTitle ?? documentTitle,
             description,
             openGraphTitle,
             openGraphDescription,

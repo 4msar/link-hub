@@ -12,6 +12,12 @@ import {
     getSignalFiles,
     getSignalUrl,
 } from "@/lib/signals";
+import {
+    SIGNALS_DESCRIPTION,
+    SIGNALS_TITLE,
+    SITE_NAME,
+    TWITTER_HANDLE,
+} from "@/lib/site";
 import { ExternalLink, Info, Rss } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -19,17 +25,38 @@ import Link from "next/link";
 export const revalidate = 86400;
 
 const fallbackSignalsMetadata: Metadata = {
-    title: "Signals",
-    description: "View the latest signal artifact files.",
+    title: SIGNALS_TITLE,
+    description: SIGNALS_DESCRIPTION,
+    keywords: [
+        "Inbox Signal",
+        "newsletter digest",
+        "weekly digest",
+        "engineering newsletters",
+        "AI newsletters",
+        "tech news summary",
+    ],
+    alternates: {
+        canonical: "/signals",
+        types: {
+            "application/rss+xml": [
+                { url: "/signals/feed", title: "Pockets — Signals" },
+            ],
+        },
+    },
     openGraph: {
-        title: "Signals",
-        description: "View the latest signal artifact files.",
+        title: SIGNALS_TITLE,
+        description: SIGNALS_DESCRIPTION,
+        url: "/signals",
+        siteName: SITE_NAME,
+        locale: "en_US",
         type: "website",
     },
     twitter: {
         card: "summary_large_image",
-        title: "Signals",
-        description: "View the latest signal artifact files.",
+        site: TWITTER_HANDLE,
+        creator: TWITTER_HANDLE,
+        title: SIGNALS_TITLE,
+        description: SIGNALS_DESCRIPTION,
     },
 };
 

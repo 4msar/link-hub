@@ -1,12 +1,12 @@
 import { getLinks } from "@/lib/api";
 import { getSignalFiles } from "@/lib/signals";
+import { SITE_URL } from "@/lib/site";
 import { LinkItem } from "@/types/link";
 import type { MetadataRoute } from "next";
 
 // Cache duration for this route
 export const revalidate = 3600; // 1 hour
 
-const SITE_URL = "https://pockets.msar.me";
 const LINKS_PER_PAGE = 100;
 
 const getAllLinks = async (): Promise<LinkItem[]> => {
