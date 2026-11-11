@@ -4,15 +4,18 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
     ArrowLeft,
+    Building2,
     Check,
     ExternalLink,
     Inbox,
     Loader2,
+    Link2,
     LogOut,
     Pencil,
     Trash2,
     X,
 } from "lucide-react";
+import type { ApproveTarget } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -92,6 +95,10 @@ export default function ReviewPage() {
     const [busyId, setBusyId] = useState<number | null>(null);
     const [editing, setEditing] = useState<Submission | null>(null);
     const [editTitle, setEditTitle] = useState("");
+    const [editTarget, setEditTarget] = useState<ApproveTarget>("link");
+    // quick-approve chooser: which submission is being approved, and where to
+    const [chooseFor, setChooseFor] = useState<Submission | null>(null);
+    const [chooseTarget, setChooseTarget] = useState<ApproveTarget>("link");
     const [editLink, setEditLink] = useState("");
 
     // Loading is derived: a request is in flight until its key has loaded
@@ -168,7 +175,7 @@ export default function ReviewPage() {
 
     const approve = (
         submission: Submission,
-        overrides: { title?: string; link?: string } = {},
+        overrides: { title?: string; link?: string; target?: ApproveTarget } = {},
     ) =>
         runAction(
             submission,
@@ -176,8 +183,16 @@ export default function ReviewPage() {
                 method: "POST",
                 body: JSON.stringify({ action: "approve", ...overrides }),
             },
-            "Approved and added to the collection",
+            overrides.target === "company"
+                ? "Approved and added to companies"
+                : "Approved and added to links",
         );
+
+    const confirmChoose = async () => {
+        if (!chooseFor) return;
+        const ok = await approve(chooseFor, { target: chooseTarget });
+        if (ok) setChooseFor(null);
+    };
 
     const reject = (submission: Submission) =>
         runAction(
@@ -193,6 +208,7 @@ export default function ReviewPage() {
         setEditing(submission);
         setEditTitle(submission.title);
         setEditLink(submission.link);
+        setEditTarget("link");
     };
 
     const handleEditApprove = async (e: React.FormEvent) => {
@@ -201,6 +217,7 @@ export default function ReviewPage() {
         const ok = await approve(editing, {
             title: editTitle,
             link: editLink,
+            target: editTarget,
         });
         if (ok) setEditing(null);
     };
@@ -394,9 +411,10 @@ export default function ReviewPage() {
                                         <div className="flex shrink-0 items-center gap-2">
                                             <Button
                                                 size="sm"
-                                                onClick={() =>
-                                                    approve(submission)
-                                                }
+                                                onClick={() => {
+                                                    setChooseTarget("link");
+                                                    setChooseFor(submission);
+                                                }}
                                                 disabled={isBusy}
                                             >
                                                 {isBusy ? (
@@ -531,6 +549,10 @@ export default function ReviewPage() {
                                 required
                             />
                         </div>
+                        <TargetPicker
+                            value={editTarget}
+                            onChange={setEditTarget}
+                        />
                         <div className="space-y-2">
                             <Label htmlFor="edit-link">Link</Label>
                             <Input
@@ -564,6 +586,85 @@ export default function ReviewPage() {
                     </form>
                 </DialogContent>
             </Dialog>
+
+            <Dialog
+                open={chooseFor !== null}
+                onOpenChange={(open) => !open && setChooseFor(null)}
+            >
+                <DialogContent className="w-[calc(100%-2rem)] rounded-2xl sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Add to where?</DialogTitle>
+                        <DialogDescription>
+                            Links appear on the home page. Companies appear on
+                            the companies page.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <TargetPicker
+                        value={chooseTarget}
+                        onChange={setChooseTarget}
+                    />
+                    <DialogFooter>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setChooseFor(null)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type="button"
+                            onClick={confirmChoose}
+                            disabled={busyId === chooseFor?.id}
+                        >
+                            {busyId === chooseFor?.id ? (
+                                <Loader2 className="animate-spin" />
+                            ) : (
+                                <Check />
+                            )}
+                            Approve
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </div>
+    );
+}
+
+// Link (default) or company; the approved submission is added to that list
+function TargetPicker({
+    value,
+    onChange,
+}: {
+    value: ApproveTarget;
+    onChange: (value: ApproveTarget) => void;
+}) {
+    const options: { value: ApproveTarget; label: string; icon: typeof Link2 }[] = [
+        { value: "link", label: "Link", icon: Link2 },
+        { value: "company", label: "Company", icon: Building2 },
+    ];
+    return (
+        <div
+            role="radiogroup"
+            aria-label="Add to"
+            className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1"
+        >
+            {options.map(({ value: option, label, icon: Icon }) => (
+                <button
+                    key={option}
+                    type="button"
+                    role="radio"
+                    aria-checked={value === option}
+                    onClick={() => onChange(option)}
+                    className={`flex h-9 items-center justify-center gap-2 rounded-md text-sm font-medium transition-all ${
+                        value === option
+                            ? "bg-background text-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground"
+                    }`}
+                >
+                    <Icon className="h-4 w-4" />
+                    {label}
+                </button>
+            ))}
         </div>
     );
 }

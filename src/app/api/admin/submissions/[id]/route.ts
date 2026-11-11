@@ -24,7 +24,12 @@ export async function POST(request: NextRequest, { params }: Params) {
         return NextResponse.json({ error: "Invalid id" }, { status: 400 });
     }
 
-    let body: { action?: string; title?: string; link?: string } = {};
+    let body: {
+        action?: string;
+        title?: string;
+        link?: string;
+        target?: string;
+    } = {};
     try {
         body = await request.json();
     } catch {
@@ -33,13 +38,19 @@ export async function POST(request: NextRequest, { params }: Params) {
 
     try {
         if (body.action === "approve") {
+            const target = body.target === "company" ? "company" : "link";
             const result = await approveSubmission(id, {
                 title: body.title?.trim() || undefined,
                 link: body.link?.trim() || undefined,
+                target,
             });
             if (result.ok) {
                 revalidatePath("/api/links");
                 revalidateTag(CACHE_TAGS.links, "max");
+                if (target === "company") {
+                    revalidatePath("/companies");
+                    revalidateTag("companies", "max");
+                }
             }
             return NextResponse.json(result.data, { status: result.status });
         }

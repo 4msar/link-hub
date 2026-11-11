@@ -291,11 +291,13 @@ export const getSubmissions = (params: {
     );
 };
 
+export type ApproveTarget = "link" | "company";
+
 export const approveSubmission = (
     id: number,
-    data: { title?: string; link?: string } = {},
+    data: { title?: string; link?: string; target?: ApproveTarget } = {},
 ) =>
-    submissionsRequest<{ item?: LinkItem; error?: string }>(
+    submissionsRequest<{ item?: LinkItem; company?: Company; error?: string }>(
         `/${id}/approve`,
         { method: "POST", body: JSON.stringify(data) },
     );
