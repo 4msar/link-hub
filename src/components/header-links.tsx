@@ -24,8 +24,12 @@ export const HeaderLinks = () => {
                 >
                     {item.href ? (
                         <a
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            {...(item.sameTab
+                                ? {}
+                                : {
+                                      target: "_blank",
+                                      rel: "noopener noreferrer",
+                                  })}
                             href={item.href}
                         >
                             {item.label}

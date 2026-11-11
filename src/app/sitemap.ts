@@ -19,6 +19,7 @@ const getAllLinks = async (): Promise<LinkItem[]> => {
             page,
             per_page: LINKS_PER_PAGE,
             include_timestamps: "true",
+            category: "link",
         });
         links.push(...(response.data || []));
         lastPage = response.meta?.last_page ?? page;

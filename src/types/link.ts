@@ -3,7 +3,13 @@ export interface LinkItem {
     title: string;
     slug: string;
     link: string;
+    category?: string;
     created_at?: string;
+}
+
+export interface CategorySummary {
+    name: string;
+    count: number;
 }
 
 export type LinksResponse = PaginatedItems<LinkItem>

@@ -5,6 +5,7 @@
  * This modules should only use in backend/server-side code.
  */
 import {
+    CategorySummary,
     LinkDetailsResponse,
     LinkItem,
     LinksResponse,
@@ -137,11 +138,36 @@ export const postComment = async (
     return response.json();
 };
 
+export const getCategories = async (): Promise<CategorySummary[]> => {
+    const response = await fetch(
+        `${BASE_API_URL}/values/${projectID}/_categories`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Project-Id": projectID,
+                Authorization: `Bearer ${apiKey}`,
+            },
+            next: {
+                revalidate: 3600,
+                tags: ["links"],
+            },
+        } as RequestInit,
+    );
+
+    if (!response.ok) {
+        throw new Error(`Error fetching categories: ${response.statusText}`);
+    }
+
+    const data: { categories: CategorySummary[] } = await response.json();
+    return data.categories;
+};
+
 export const createLink = async (data: {
     name: string;
     slug: string;
     value: string;
-    type: "text" | "url" | "link";
+    category: string;
 }): Promise<unknown> => {
     const response = await fetch(`${BASE_API_URL}/values/${projectID}`, {
         method: "POST",

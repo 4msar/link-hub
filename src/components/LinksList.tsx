@@ -37,7 +37,11 @@ const LinksList = () => {
         isFetchingNextPage,
         hasNextPage,
         fetchNextPage,
-    } = useInfiniteLinks({ search, include_timestamps: "true" });
+    } = useInfiniteLinks({
+        search,
+        include_timestamps: "true",
+        category: "link",
+    });
 
     const links = data?.pages.flatMap((page) => page.data) ?? [];
     const total = data?.pages[0]?.meta?.total;
