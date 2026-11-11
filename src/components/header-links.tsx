@@ -2,13 +2,14 @@
 
 import { useSearchParams } from "next/navigation";
 import { Badge } from "./ui/badge";
+import Link from "next/link";
 
 const navItems = [
     { label: "msar.me", href: "https://msar.me" },
     { label: "blog", href: "https://blog.msar.me" },
-    { label: "signals", href: "/signals" },
+    { label: "signals", href: "/signals", sameTab: true },
+    // { label: "companies", href: "/companies", sameTab: true },
     { label: "rss", href: "/feed" },
-    { label: "companies", href: "/companies", sameTab: true },
 ];
 
 export const HeaderLinks = () => {
@@ -24,14 +25,17 @@ export const HeaderLinks = () => {
                     key={item.label}
                 >
                     {item.href ? (
-                        <a
+                        <Link
                             {...(item.sameTab
                                 ? {}
-                                : { target: "_blank", rel: "noopener noreferrer" })}
+                                : {
+                                      target: "_blank",
+                                      rel: "noopener noreferrer",
+                                  })}
                             href={item.href}
                         >
                             {item.label}
-                        </a>
+                        </Link>
                     ) : (
                         item.label
                     )}
