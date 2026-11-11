@@ -1,6 +1,14 @@
 "use client";
 
-import { Infinity as InfinityIcon, ListPlus, Settings2 } from "lucide-react";
+import {
+    Infinity as InfinityIcon,
+    ListPlus,
+    Monitor,
+    Moon,
+    Settings2,
+    Sun,
+} from "lucide-react";
+import { useTheme } from "next-themes";
 import {
     Popover,
     PopoverContent,
@@ -15,6 +23,16 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+
+const themeOptions: {
+    value: "system" | "light" | "dark";
+    label: string;
+    icon: typeof Sun;
+}[] = [
+    { value: "system", label: "System", icon: Monitor },
+    { value: "light", label: "Light", icon: Sun },
+    { value: "dark", label: "Dark", icon: Moon },
+];
 
 const loadModeOptions: {
     value: LoadMode;
@@ -38,6 +56,7 @@ const loadModeOptions: {
 
 export const HomeSettings = () => {
     const { settings, updateSettings } = useHomeSettings();
+    const { theme, setTheme } = useTheme();
 
     return (
         <Popover>
@@ -69,6 +88,37 @@ export const HomeSettings = () => {
                     </p>
                 </div>
                 <div className="p-3">
+                    <p className="px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        Appearance
+                    </p>
+                    <div
+                        role="radiogroup"
+                        aria-label="Color theme"
+                        className="mb-4 grid grid-cols-3 gap-1 rounded-lg bg-muted p-1"
+                    >
+                        {themeOptions.map(({ value, label, icon: Icon }) => {
+                            const active = (theme ?? "system") === value;
+                            return (
+                                <button
+                                    key={value}
+                                    type="button"
+                                    role="radio"
+                                    aria-checked={active}
+                                    onClick={() => setTheme(value)}
+                                    className={cn(
+                                        "flex h-9 items-center justify-center gap-2 rounded-md text-sm font-medium transition-all",
+                                        active
+                                            ? "bg-background text-foreground shadow-sm"
+                                            : "text-muted-foreground hover:text-foreground",
+                                    )}
+                                >
+                                    <Icon className="size-4" />
+                                    {label}
+                                </button>
+                            );
+                        })}
+                    </div>
+
                     <p className="px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                         Loading items
                     </p>

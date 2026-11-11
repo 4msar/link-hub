@@ -183,41 +183,33 @@ export const createCompany = async (data: {
     return response.json();
 };
 
-// Every company, paged through the backend. Companies are a plain link list
-// on /companies: no comments and no per-item pages.
-export const getCompanies = async (): Promise<Company[]> => {
-    const companies: Company[] = [];
-    let page = 1;
-    let lastPage = 1;
+// One page of companies. Companies are a plain link list on /companies:
+// no comments and no per-item pages.
+export const getCompaniesPage = async (
+    page: number,
+    perPage: number,
+): Promise<PaginatedItems<Company>> => {
+    const response = await fetch(
+        `${BASE_API_URL}/companies/${projectID}?page=${page}&per_page=${perPage}`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Project-Id": projectID,
+                Authorization: `Bearer ${apiKey}`,
+            },
+            next: {
+                revalidate: 3600,
+                tags: ["companies"],
+            },
+        } as RequestInit,
+    );
 
-    do {
-        const response = await fetch(
-            `${BASE_API_URL}/companies/${projectID}?page=${page}&per_page=100`,
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-Project-Id": projectID,
-                    Authorization: `Bearer ${apiKey}`,
-                },
-                next: {
-                    revalidate: 3600,
-                    tags: ["companies"],
-                },
-            } as RequestInit,
-        );
+    if (!response.ok) {
+        throw new Error(`Error fetching companies: ${response.statusText}`);
+    }
 
-        if (!response.ok) {
-            throw new Error(`Error fetching companies: ${response.statusText}`);
-        }
-
-        const data: PaginatedItems<Company> = await response.json();
-        companies.push(...(data.data || []));
-        lastPage = data.meta?.last_page ?? page;
-        page++;
-    } while (page <= lastPage);
-
-    return companies;
+    return response.json();
 };
 
 export const getLinkMetaData = async (

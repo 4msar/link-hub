@@ -1,13 +1,16 @@
 import { LinkPreviews } from "@/components/LinkPreviews";
-import { getCompanies } from "@/lib/api";
+import { getCompaniesPage } from "@/lib/api";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
     title: "Companies",
     description: "Companies saved on Pockets.",
     alternates: { canonical: "/companies" },
 };
+
+const PER_PAGE = 50;
 
 const hostOf = (href: string) => {
     try {
@@ -17,13 +20,34 @@ const hostOf = (href: string) => {
     }
 };
 
-export default async function CompaniesPage() {
-    let companies: Awaited<ReturnType<typeof getCompanies>> = [];
+const pageHref = (page: number) =>
+    page <= 1 ? "/companies" : `/companies?page=${page}`;
+
+export default async function CompaniesPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ page?: string }>;
+}) {
+    const { page: rawPage } = await searchParams;
+    const requested = Math.max(1, Number.parseInt(rawPage ?? "1", 10) || 1);
+
+    let result: Awaited<ReturnType<typeof getCompaniesPage>> | null = null;
     try {
-        companies = await getCompanies();
+        result = await getCompaniesPage(requested, PER_PAGE);
     } catch {
-        companies = [];
+        result = null;
     }
+
+    const companies = result?.data ?? [];
+    const total = result?.meta?.total ?? 0;
+    const lastPage = result?.meta?.last_page ?? 1;
+
+    // Past the end (e.g. items were deleted): send the visitor to the last page
+    if (result && requested > lastPage && total > 0) {
+        redirect(pageHref(lastPage));
+    }
+
+    const currentPage = result?.meta?.current_page ?? requested;
 
     return (
         <div className="min-h-screen bg-background">
@@ -39,7 +63,8 @@ export default async function CompaniesPage() {
                         Companies
                     </h1>
                     <p className="mt-1 text-sm text-muted-foreground">
-                        {companies.length} {companies.length === 1 ? "company" : "companies"}
+                        {total} {total === 1 ? "company" : "companies"}
+                        {lastPage > 1 && ` · page ${currentPage} of ${lastPage}`}
                     </p>
                 </header>
 
@@ -67,6 +92,39 @@ export default async function CompaniesPage() {
                             ))}
                         </ul>
                     </div>
+                )}
+
+                {lastPage > 1 && (
+                    <nav
+                        aria-label="Companies pagination"
+                        className="mt-6 flex items-center justify-between text-sm"
+                    >
+                        {currentPage > 1 ? (
+                            <Link
+                                href={pageHref(currentPage - 1)}
+                                rel="prev"
+                                className="rounded-md border border-border px-3 py-1.5 text-foreground hover:bg-muted/50"
+                            >
+                                ← Previous
+                            </Link>
+                        ) : (
+                            <span />
+                        )}
+                        <span className="text-muted-foreground">
+                            Page {currentPage} of {lastPage}
+                        </span>
+                        {currentPage < lastPage ? (
+                            <Link
+                                href={pageHref(currentPage + 1)}
+                                rel="next"
+                                className="rounded-md border border-border px-3 py-1.5 text-foreground hover:bg-muted/50"
+                            >
+                                Next →
+                            </Link>
+                        ) : (
+                            <span />
+                        )}
+                    </nav>
                 )}
             </div>
             <LinkPreviews />
