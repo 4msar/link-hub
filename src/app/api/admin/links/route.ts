@@ -4,7 +4,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 
 export async function POST(request: NextRequest) {
     try {
-        const { pin, name, slug, value, category } = await request.json();
+        const { pin, name, slug, value, type } = await request.json();
         const adminPin = process.env.ADMIN_PIN;
 
         // Verify PIN
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Validate required fields
-        if (!name || !slug || !value) {
+        if (!name || !slug || !value || !type) {
             return NextResponse.json(
                 { error: "Missing required fields" },
                 { status: 400 },
@@ -31,16 +31,10 @@ export async function POST(request: NextRequest) {
         }
 
         // Create the link
-        const result = await createLink({
-            name,
-            slug,
-            value,
-            category: category || "link",
-        });
+        const result = await createLink({ name, slug, value, type });
 
-        // Revalidate the links cache and the category pages
+        // Revalidate the links cache
         revalidatePath("/api/links");
-        revalidatePath("/categories");
         revalidateTag("links", "max");
 
         return NextResponse.json(

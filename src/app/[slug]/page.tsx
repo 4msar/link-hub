@@ -68,10 +68,6 @@ export default async function Page({
         }
 
         const link = data.item;
-        // Non-link categories (e.g. company) are listed on /category/[name] only
-        if ((link.category ?? "link") !== "link") {
-            notFound();
-        }
         const isUrl = link.link.startsWith("http");
 
         return (

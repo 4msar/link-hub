@@ -5,10 +5,11 @@
  * This modules should only use in backend/server-side code.
  */
 import {
-    CategorySummary,
+    Company,
     LinkDetailsResponse,
     LinkItem,
     LinksResponse,
+    PaginatedItems,
     Submission,
     SubmissionsResponse,
 } from "@/types/link";
@@ -138,36 +139,11 @@ export const postComment = async (
     return response.json();
 };
 
-export const getCategories = async (): Promise<CategorySummary[]> => {
-    const response = await fetch(
-        `${BASE_API_URL}/values/${projectID}/_categories`,
-        {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "X-Project-Id": projectID,
-                Authorization: `Bearer ${apiKey}`,
-            },
-            next: {
-                revalidate: 3600,
-                tags: ["links"],
-            },
-        } as RequestInit,
-    );
-
-    if (!response.ok) {
-        throw new Error(`Error fetching categories: ${response.statusText}`);
-    }
-
-    const data: { categories: CategorySummary[] } = await response.json();
-    return data.categories;
-};
-
 export const createLink = async (data: {
     name: string;
     slug: string;
     value: string;
-    category: string;
+    type: "text" | "url" | "link";
 }): Promise<unknown> => {
     const response = await fetch(`${BASE_API_URL}/values/${projectID}`, {
         method: "POST",
@@ -184,6 +160,43 @@ export const createLink = async (data: {
     }
 
     return response.json();
+};
+
+// Every company, paged through the backend. Companies are a plain link list
+// on /companies: no comments and no per-item pages.
+export const getCompanies = async (): Promise<Company[]> => {
+    const companies: Company[] = [];
+    let page = 1;
+    let lastPage = 1;
+
+    do {
+        const response = await fetch(
+            `${BASE_API_URL}/companies/${projectID}?page=${page}&per_page=100`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Project-Id": projectID,
+                    Authorization: `Bearer ${apiKey}`,
+                },
+                next: {
+                    revalidate: 3600,
+                    tags: ["companies"],
+                },
+            } as RequestInit,
+        );
+
+        if (!response.ok) {
+            throw new Error(`Error fetching companies: ${response.statusText}`);
+        }
+
+        const data: PaginatedItems<Company> = await response.json();
+        companies.push(...(data.data || []));
+        lastPage = data.meta?.last_page ?? page;
+        page++;
+    } while (page <= lastPage);
+
+    return companies;
 };
 
 export const getLinkMetaData = async (

@@ -62,7 +62,6 @@ export async function GET() {
         const response = await getLinks({
             per_page: 100,
             include_timestamps: "true",
-            category: "link",
         });
         const links = response.data || [];
 

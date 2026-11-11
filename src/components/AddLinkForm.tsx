@@ -5,14 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Globe, Loader2, Plus } from "lucide-react";
+import { FileText, Globe, Link2, Loader2, Plus } from "lucide-react";
 import { getLinkMetaData } from "@/lib/api";
+import { cn } from "@/lib/utils";
 
-const DEFAULT_CATEGORY = "link";
+type LinkType = "text" | "url" | "link";
 
-// Categories are lowercase words joined by hyphens, e.g. "company" or "side-projects"
-const normalizeCategory = (text: string): string =>
-    text.trim().toLowerCase().replace(/\s+/g, "-") || DEFAULT_CATEGORY;
+const LINK_TYPES: { value: LinkType; label: string; icon: typeof Globe }[] = [
+    { value: "url", label: "URL", icon: Globe },
+    { value: "text", label: "Text", icon: FileText },
+    { value: "link", label: "Link", icon: Link2 },
+];
 
 // Helper function to convert text to URL-friendly slug
 const slugify = (text: string): string => {
@@ -30,8 +33,7 @@ export const AddLinkForm = ({ pin }: { pin: string }) => {
     const [name, setName] = useState("");
     const [slug, setSlug] = useState("");
     const [value, setValue] = useState("");
-    const [category, setCategory] = useState(DEFAULT_CATEGORY);
-    const [categories, setCategories] = useState<string[]>([]);
+    const [type, setType] = useState<LinkType>("url");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isFetchingMeta, setIsFetchingMeta] = useState(false);
 
@@ -43,13 +45,7 @@ export const AddLinkForm = ({ pin }: { pin: string }) => {
             const response = await fetch("/api/admin/links", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    pin,
-                    name,
-                    slug,
-                    value,
-                    category: normalizeCategory(category),
-                }),
+                body: JSON.stringify({ pin, name, slug, value, type }),
             });
 
             if (response.ok) {
@@ -58,7 +54,7 @@ export const AddLinkForm = ({ pin }: { pin: string }) => {
                 setName("");
                 setSlug("");
                 setValue("");
-                setCategory(DEFAULT_CATEGORY);
+                setType("url");
             } else {
                 const data = await response.json();
                 toast.error(data.error || "Failed to add link");
@@ -88,6 +84,7 @@ export const AddLinkForm = ({ pin }: { pin: string }) => {
                 const response = await getLinkMetaData(value);
                 if (!cancelled && response.title) {
                     setName(response.title);
+                    setType("link");
                 }
             } catch (error) {
             } finally {
@@ -101,22 +98,6 @@ export const AddLinkForm = ({ pin }: { pin: string }) => {
             setIsFetchingMeta(false);
         };
     }, [value]);
-
-    // Existing categories as suggestions
-    useEffect(() => {
-        let cancelled = false;
-        fetch("/api/categories")
-            .then((res) => (res.ok ? res.json() : null))
-            .then((data) => {
-                if (!cancelled && data?.categories) {
-                    setCategories(data.categories.map((c: { name: string }) => c.name));
-                }
-            })
-            .catch(() => {});
-        return () => {
-            cancelled = true;
-        };
-    }, []);
 
     // Auto-generate slug from name
     useEffect(() => {
@@ -182,26 +163,34 @@ export const AddLinkForm = ({ pin }: { pin: string }) => {
                 </div>
             </div>
 
-            <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
-                <Input
-                    id="category"
-                    type="text"
-                    list="category-options"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    placeholder={DEFAULT_CATEGORY}
-                    className="h-11"
-                />
-                <datalist id="category-options">
-                    {categories.map((name) => (
-                        <option key={name} value={name} />
+            <fieldset className="space-y-2">
+                <legend className="text-sm font-medium leading-none mb-2">
+                    Type
+                </legend>
+                <div
+                    role="radiogroup"
+                    className="grid grid-cols-3 gap-1 rounded-lg bg-muted p-1"
+                >
+                    {LINK_TYPES.map(({ value: option, label, icon: Icon }) => (
+                        <button
+                            key={option}
+                            type="button"
+                            role="radio"
+                            aria-checked={type === option}
+                            onClick={() => setType(option)}
+                            className={cn(
+                                "flex h-9 items-center justify-center gap-2 rounded-md text-sm font-medium transition-all",
+                                type === option
+                                    ? "bg-background text-foreground shadow-sm"
+                                    : "text-muted-foreground hover:text-foreground",
+                            )}
+                        >
+                            <Icon className="h-4 w-4" />
+                            {label}
+                        </button>
                     ))}
-                </datalist>
-                <p className="text-xs text-muted-foreground">
-                    Pick an existing category or type a new one. Defaults to {DEFAULT_CATEGORY}.
-                </p>
-            </div>
+                </div>
+            </fieldset>
 
             <Button
                 type="submit"

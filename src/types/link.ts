@@ -3,13 +3,15 @@ export interface LinkItem {
     title: string;
     slug: string;
     link: string;
-    category?: string;
     created_at?: string;
 }
 
-export interface CategorySummary {
+export interface Company {
+    id: string | number;
     name: string;
-    count: number;
+    slug: string;
+    link: string;
+    created_at?: string;
 }
 
 export type LinksResponse = PaginatedItems<LinkItem>

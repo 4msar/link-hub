@@ -8,6 +8,7 @@ const navItems = [
     { label: "blog", href: "https://blog.msar.me" },
     { label: "signals", href: "/signals" },
     { label: "rss", href: "/feed" },
+    { label: "companies", href: "/companies", sameTab: true },
 ];
 
 export const HeaderLinks = () => {
@@ -26,10 +27,7 @@ export const HeaderLinks = () => {
                         <a
                             {...(item.sameTab
                                 ? {}
-                                : {
-                                      target: "_blank",
-                                      rel: "noopener noreferrer",
-                                  })}
+                                : { target: "_blank", rel: "noopener noreferrer" })}
                             href={item.href}
                         >
                             {item.label}
