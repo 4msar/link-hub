@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createLink } from "@/lib/api";
+import { createCompany, createLink } from "@/lib/api";
 import { revalidatePath, revalidateTag } from "next/cache";
 
 export async function POST(request: NextRequest) {
@@ -30,12 +30,19 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Create the link
-        const result = await createLink({ name, slug, value, type });
+        // Create a company (companies table) or a link (items table)
+        const isCompany = type === "company";
+        const result = isCompany
+            ? await createCompany({ name, link: value })
+            : await createLink({ name, slug, value, type });
 
-        // Revalidate the links cache
+        // Revalidate the cached lists
         revalidatePath("/api/links");
         revalidateTag("links", "max");
+        if (isCompany) {
+            revalidatePath("/companies");
+            revalidateTag("companies", "max");
+        }
 
         return NextResponse.json(
             { success: true, data: result },

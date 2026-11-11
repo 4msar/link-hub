@@ -162,6 +162,27 @@ export const createLink = async (data: {
     return response.json();
 };
 
+export const createCompany = async (data: {
+    name: string;
+    link: string;
+}): Promise<unknown> => {
+    const response = await fetch(`${BASE_API_URL}/companies/${projectID}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-Project-Id": projectID,
+            Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Error creating company: ${response.statusText}`);
+    }
+
+    return response.json();
+};
+
 // Every company, paged through the backend. Companies are a plain link list
 // on /companies: no comments and no per-item pages.
 export const getCompanies = async (): Promise<Company[]> => {

@@ -5,16 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { FileText, Globe, Link2, Loader2, Plus } from "lucide-react";
+import { Building2, Globe, Link2, Loader2, Plus } from "lucide-react";
 import { getLinkMetaData } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
-type LinkType = "text" | "url" | "link";
+// "link" goes to the saved links, "company" to the companies list (/companies)
+type SaveType = "link" | "company";
 
-const LINK_TYPES: { value: LinkType; label: string; icon: typeof Globe }[] = [
-    { value: "url", label: "URL", icon: Globe },
-    { value: "text", label: "Text", icon: FileText },
+const SAVE_TYPES: { value: SaveType; label: string; icon: typeof Globe }[] = [
     { value: "link", label: "Link", icon: Link2 },
+    { value: "company", label: "Company", icon: Building2 },
 ];
 
 // Helper function to convert text to URL-friendly slug
@@ -33,7 +33,7 @@ export const AddLinkForm = ({ pin }: { pin: string }) => {
     const [name, setName] = useState("");
     const [slug, setSlug] = useState("");
     const [value, setValue] = useState("");
-    const [type, setType] = useState<LinkType>("url");
+    const [type, setType] = useState<SaveType>("link");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isFetchingMeta, setIsFetchingMeta] = useState(false);
 
@@ -49,12 +49,16 @@ export const AddLinkForm = ({ pin }: { pin: string }) => {
             });
 
             if (response.ok) {
-                toast.success("Link added successfully!");
+                toast.success(
+                    type === "company"
+                        ? "Company added successfully!"
+                        : "Link added successfully!",
+                );
                 // Reset form
                 setName("");
                 setSlug("");
                 setValue("");
-                setType("url");
+                setType("link");
             } else {
                 const data = await response.json();
                 toast.error(data.error || "Failed to add link");
@@ -84,7 +88,6 @@ export const AddLinkForm = ({ pin }: { pin: string }) => {
                 const response = await getLinkMetaData(value);
                 if (!cancelled && response.title) {
                     setName(response.title);
-                    setType("link");
                 }
             } catch (error) {
             } finally {
@@ -165,13 +168,13 @@ export const AddLinkForm = ({ pin }: { pin: string }) => {
 
             <fieldset className="space-y-2">
                 <legend className="text-sm font-medium leading-none mb-2">
-                    Type
+                    Save as
                 </legend>
                 <div
                     role="radiogroup"
-                    className="grid grid-cols-3 gap-1 rounded-lg bg-muted p-1"
+                    className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1"
                 >
-                    {LINK_TYPES.map(({ value: option, label, icon: Icon }) => (
+                    {SAVE_TYPES.map(({ value: option, label, icon: Icon }) => (
                         <button
                             key={option}
                             type="button"
