@@ -188,9 +188,16 @@ export const createCompany = async (data: {
 export const getCompaniesPage = async (
     page: number,
     perPage: number,
+    search?: string,
 ): Promise<PaginatedItems<Company>> => {
+    const query = new URLSearchParams({
+        page: String(page),
+        per_page: String(perPage),
+    });
+    if (search) query.set("search", search);
+
     const response = await fetch(
-        `${BASE_API_URL}/companies/${projectID}?page=${page}&per_page=${perPage}`,
+        `${BASE_API_URL}/companies/${projectID}?${query.toString()}`,
         {
             method: "GET",
             headers: {
