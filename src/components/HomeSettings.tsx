@@ -10,7 +10,11 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { LoadMode, useHomeSettings } from "@/hooks/useHomeSettings";
 import { cn } from "@/lib/utils";
-import { TooltipTitle } from "./tooltip";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const loadModeOptions: {
     value: LoadMode;
@@ -37,17 +41,24 @@ export const HomeSettings = () => {
 
     return (
         <Popover>
-            <PopoverTrigger asChild>
-                <TooltipTitle title="Open display settings">
-                    <button
-                        type="button"
-                        aria-label="Display settings"
-                        className="inline-flex size-9 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    >
-                        <Settings2 className="size-4" />
-                    </button>
-                </TooltipTitle>
-            </PopoverTrigger>
+            {/* The popover trigger must be the button itself: TooltipTitle does
+                not forward the trigger props, so the click would never reach it. */}
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <PopoverTrigger asChild>
+                        <button
+                            type="button"
+                            aria-label="Display settings"
+                            className="inline-flex size-9 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                            <Settings2 className="size-4" />
+                        </button>
+                    </PopoverTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>Open display settings</p>
+                </TooltipContent>
+            </Tooltip>
             <PopoverContent align="end" className="w-80 rounded-xl p-0">
                 <div className="border-b border-border px-4 py-3">
                     <p className="text-sm font-bold text-foreground">
